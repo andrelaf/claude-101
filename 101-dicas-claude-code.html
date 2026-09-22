@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 33</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 34</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;33<br>(capítulos 1 a 5)</p>
+      <p>Cobertura atual: dicas 1&ndash;34<br>(capítulos 1 a 5)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 33 de 101</b></span>
+        <span>Leitura: <b>dica 34 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 5</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -562,7 +562,7 @@ const TIPS = [
     note:{lbl:"O que é recurso e o que é anedota", html:`<strong>O arquivo sobrevive; o contexto não.</strong> A doc é explícita: "Sessions are independent. Each new session starts with a fresh context window, without the conversation history from previous sessions". O plano em <code>~/.claude/plans</code> persiste como arquivo &mdash; mas nenhuma página documenta o Claude <em>relendo</em> um plano salvo por conta própria, nem casamento por semelhança de tarefa. O sintoma desta dica não está no manual.<br><strong>Não existe comando para apagar o plano.</strong> "DELETE THE PLAN" é técnica de prompt, não recurso, e o "quebra o padrão de forma confiável" é experiência do autor. A rota documentada para recomeçar é <code>Shift+Tab</code> ou prefixar um prompt com <code>/plan</code>; e <code>showClearContextOnPlanAccept: true</code> acrescenta a opção de aprovar o plano <em>e</em> limpar o contexto, começando a implementação a partir do plano sozinho.`},
     docs:[["Plan mode","https://code.claude.com/docs/en/permission-modes"],["plansDirectory","https://code.claude.com/docs/en/settings-reference"],["Sessions","https://code.claude.com/docs/en/sessions"]] },
 
-  { n:33, ch:5, here:true,
+  { n:33, ch:5,
     title:"Para features grandes, peça ao Claude que entreviste você antes",
     orig:"For larger features, have Claude interview you first",
     body:`<p>Quando a tarefa é "adicionar multi-tenancy ao nosso SaaS", até um bom plano do Claude é chute. O modelo ainda não sabe qual escopo, qual nível de isolamento, quais implicações de cobrança, qual estratégia de migração. Ele precisa de mais de você antes de conseguir planejar bem.</p>
@@ -570,7 +570,16 @@ const TIPS = [
     <p>Terminado o spec, <strong>abra uma sessão nova para executar</strong>. Ela chega com contexto limpo, voltado só para a implementação, e o vaivém da entrevista não a polui.</p>`,
     code:{lang:"prompt", text:`I want to add multi-tenancy. Before writing any code or even any plan,\ninterview me. Ask about scope (per-account vs per-workspace),\nisolation level (shared schema vs separate database), billing\nimplications, migration strategy for existing data, and any other\ndimensions you think I am missing.\n\nSave the answers and your understanding to SPEC.md when we are done.\n\nThen I will start a fresh session to execute against SPEC.md.`},
     note:{lbl:"Uma correção e duas adições", html:`<strong>Não é uma pergunta por vez.</strong> O livro diz que o <code>AskUserQuestion</code> faz "one structured question at a time". Cada chamada aceita de <strong>1 a 4 perguntas</strong>, com 2 a 4 opções cada, tem <code>multiSelect</code> para marcar mais de uma, e uma linha "Other" para texto livre. A entrevista é mais larga do que o livro sugere.<br><strong>O que faz um spec bom</strong>, que o livro não diz: a doc pede um spec <em>autocontido</em> &mdash; que nomeie os arquivos e interfaces envolvidos, diga o que está <strong>fora de escopo</strong>, e termine com um passo de verificação ponta a ponta que prove que a feature funciona. "Tempo gasto deixando o spec preciso rende mais que tempo gasto assistindo à implementação." O "fora de escopo" é a <a href="#dica-12">dica 12</a> desta página, aplicada ao spec em vez do CLAUDE.md.<br><strong>Onde a técnica não funciona.</strong> O <code>AskUserQuestion</code> não está disponível em subagents abertos pela ferramenta Agent. A entrevista tem de acontecer na sessão principal.`},
-    docs:[["Best practices","https://code.claude.com/docs/en/best-practices"],["Tools reference","https://code.claude.com/docs/en/tools-reference"]] }
+    docs:[["Best practices","https://code.claude.com/docs/en/best-practices"],["Tools reference","https://code.claude.com/docs/en/tools-reference"]] },
+
+  { n:34, ch:5, here:true,
+    title:"Peça a lista de premissas antes do código, e a de decisões depois",
+    orig:"Tell Claude to list assumptions before writing any code",
+    body:`<p>É a checagem de sanidade de menor atrito que existe. Dois prompts, nesta ordem &mdash; um antes, um depois.</p>
+    <p>O primeiro força as <strong>premissas silenciosas</strong> a aparecerem, onde ainda dá para corrigi-las. O segundo força as <strong>escolhas de projeto que derivaram durante a implementação</strong> a aparecerem, onde dá para revisá-las. Juntos, pegam a maior parte da distância entre "o que foi pedido" e "o que o Claude construiu".</p>
+    <p><strong>O segundo é o que se paga mais vezes.</strong> Toda implementação faz escolhas caladas: qual biblioteca, qual estilo de tratamento de erro, onde colocar o arquivo novo, como nomear a API pública. Listar isso é um prompt de cinco segundos, e revela justamente as que você quer sobrescrever.</p>`,
+    code:{lang:"prompt", text:`Before writing any code, list every assumption you are about to make.\n\n[depois da implementação]\nNow list the decisions you made that I did not specify upfront.`},
+    note:{lbl:"Onde ela se encaixa", html:`As três dicas do capítulo se dividem no tempo. A <strong>entrevista</strong> da <a href="#dica-33">dica 33</a> resolve antes: puxa para fora o que você sabe mas não disse. Esta aqui resolve <strong>durante e depois</strong>: o primeiro prompt pega o que o Claude assumiu sem dizer, o segundo pega o que ele decidiu sem perguntar. E a doc fecha o triângulo ao pedir que um spec bom termine com um passo de verificação ponta a ponta &mdash; <em>o que foi pedido</em>, <em>o que foi assumido</em>, <em>o que foi provado</em>.`} }
 ];
 
 /* ---------- render ---------- */
