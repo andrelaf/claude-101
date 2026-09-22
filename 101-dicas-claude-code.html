@@ -1,0 +1,751 @@
+<title>101 Dicas Claude Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --bg:#F4F2EC; --surface:#FBFAF6; --surface-2:#EAE7DD; --sunk:#EDEAE1;
+    --ink:#1F1E1C; --ink-2:#56544E; --ink-3:#8B8779;
+    --line:#DEDACD; --line-strong:#C9C4B4;
+    --accent:#B85B38; --accent-ink:#8F4526; --accent-soft:#F0DED4;
+    --code-bg:#262624; --code-ink:#E9E6DD; --code-dim:#9A9589; --code-line:#3A3A36;
+    --done:#4B7A52;
+    --shadow:0 1px 2px rgba(31,30,28,.05), 0 8px 24px -16px rgba(31,30,28,.25);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1B1A18; --surface:#262624; --surface-2:#302F2C; --sunk:#201F1D;
+      --ink:#F2F0E9; --ink-2:#B6B2A6; --ink-3:#8B8779;
+      --line:#38372F; --line-strong:#4A483F;
+      --accent:#E0805C; --accent-ink:#EDA183; --accent-soft:#3B2820;
+      --code-bg:#131312; --code-ink:#E9E6DD; --code-dim:#8B8779; --code-line:#2C2B29;
+      --done:#7FA986;
+      --shadow:0 1px 2px rgba(0,0,0,.35), 0 8px 24px -16px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1B1A18; --surface:#262624; --surface-2:#302F2C; --sunk:#201F1D;
+    --ink:#F2F0E9; --ink-2:#B6B2A6; --ink-3:#8B8779;
+    --line:#38372F; --line-strong:#4A483F;
+    --accent:#E0805C; --accent-ink:#EDA183; --accent-soft:#3B2820;
+    --code-bg:#131312; --code-ink:#E9E6DD; --code-dim:#8B8779; --code-line:#2C2B29;
+    --done:#7FA986;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Archivo","Segoe UI",system-ui,sans-serif;
+    font-size:15px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-ink)}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important} html{scroll-behavior:auto}}
+
+  /* ---------- shell ---------- */
+  .shell{display:grid; grid-template-columns:272px minmax(0,1fr); max-width:1240px; margin:0 auto}
+
+  .rail{
+    position:sticky; top:env(safe-area-inset-top,0px); align-self:start;
+    height:100vh; overflow-y:auto;
+    padding-block:28px 36px; padding-inline:24px 20px;
+    border-right:1px solid var(--line);
+    display:flex; flex-direction:column; gap:20px;
+  }
+  .brand{display:flex; align-items:baseline; gap:8px}
+  .brand .glyph{
+    font-family:"JetBrains Mono",ui-monospace,monospace; font-size:12px; letter-spacing:.14em;
+    color:var(--accent); border:1px solid var(--accent); border-radius:4px; padding:2px 6px;
+  }
+  .brand .who{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+
+  .gauge{display:flex; flex-direction:column; gap:8px}
+  .gauge-top{display:flex; justify-content:space-between; align-items:baseline; font-size:12px; color:var(--ink-2)}
+  .gauge-top b{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:13px; color:var(--ink); font-variant-numeric:tabular-nums}
+  .track{height:5px; background:var(--sunk); border:1px solid var(--line); border-radius:99px; overflow:hidden}
+  .fill{height:100%; width:0%; background:var(--accent); transition:width .35s ease}
+
+  .search{
+    width:100%; padding:8px 10px; font:inherit; font-size:13px;
+    background:var(--surface); color:var(--ink);
+    border:1px solid var(--line-strong); border-radius:7px;
+  }
+  .search::placeholder{color:var(--ink-3)}
+
+  .nav{display:flex; flex-direction:column; gap:14px}
+  .nav-chapter{display:flex; flex-direction:column; gap:3px}
+  .nav-chapter > summary{
+    display:flex; align-items:baseline; gap:6px; cursor:pointer; list-style:none;
+    color:var(--ink); font-weight:600; font-size:12px;
+    letter-spacing:.04em; text-transform:uppercase;
+    padding:3px 6px 3px 0; border-radius:5px;
+  }
+  .nav-chapter > summary::-webkit-details-marker{display:none}
+  .nav-chapter > summary::before{
+    content:""; flex:none; width:0; height:0; margin-right:2px;
+    border-left:4px solid var(--ink-3); border-top:3.5px solid transparent; border-bottom:3.5px solid transparent;
+    transform:rotate(0deg); transition:transform .15s ease;
+  }
+  .nav-chapter[open] > summary::before{transform:rotate(90deg)}
+  .nav-chapter > summary:hover{color:var(--accent-ink)}
+  .nav-chapter > summary:hover::before{border-left-color:var(--accent)}
+  .nav-chapter > summary small{color:var(--ink-3); font-weight:500; letter-spacing:0; text-transform:none}
+  .nav-chapter > summary small b{color:var(--done); font-weight:600}
+  .nav-tip{
+    display:flex; gap:8px; align-items:baseline; text-decoration:none;
+    color:var(--ink-2); padding:2px 6px 2px 4px; border-radius:5px; border-left:2px solid transparent;
+  }
+  .nav-tip:hover{background:var(--surface-2); color:var(--ink)}
+  .nav-tip .n{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+  .nav-tip.is-done .n{color:var(--done)}
+  .nav-tip.is-here{border-left-color:var(--accent); color:var(--accent-ink); font-weight:600}
+  .nav-tip .t{font-size:12.5px; line-height:1.35}
+
+  .rail-foot{margin-top:auto; display:flex; flex-direction:column; gap:10px; font-size:11.5px; color:var(--ink-3)}
+  .rail-foot p{margin:0}
+  .btn{
+    font:inherit; font-size:12px; cursor:pointer; background:var(--surface); color:var(--ink);
+    border:1px solid var(--line-strong); border-radius:7px; padding:6px 10px; text-align:left;
+  }
+  .btn:hover{background:var(--surface-2)}
+
+  /* ---------- main ---------- */
+  main{padding-block:44px 96px; padding-inline:40px; min-width:0}
+  .masthead{border-bottom:1px solid var(--line); padding-bottom:26px}
+  .eyebrow{font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent-ink); margin:0 0 10px}
+  .masthead h1{
+    font-family:"Newsreader",Georgia,serif; font-weight:500; font-size:clamp(30px,5vw,44px);
+    line-height:1.08; margin:0 0 12px; text-wrap:balance; letter-spacing:-.01em;
+  }
+  .masthead p{margin:0; max-width:62ch; color:var(--ink-2)}
+  .meta{display:flex; flex-wrap:wrap; gap:8px 20px; margin-top:18px; font-size:12px; color:var(--ink-3)}
+  .meta b{color:var(--ink-2); font-weight:600}
+
+  .chapter{margin-top:52px}
+  .chapter-head{display:flex; gap:14px; align-items:baseline; border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:26px}
+  .chapter-head .cn{
+    font-family:"JetBrains Mono",ui-monospace,monospace; font-size:12px; color:var(--accent);
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .chapter-head h2{font-family:"Newsreader",Georgia,serif; font-weight:500; font-size:25px; margin:0; letter-spacing:-.01em; text-wrap:balance}
+  .chapter-head .ch-note{margin:4px 0 0; font-size:13px; color:var(--ink-2); max-width:62ch}
+
+  .tips{display:flex; flex-direction:column; gap:14px}
+
+  .tip{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:20px 22px; display:grid; grid-template-columns:44px minmax(0,1fr); gap:0 16px;
+    scroll-margin-top:24px;
+  }
+  .tip.is-here{border-color:var(--accent); box-shadow:var(--shadow)}
+  .tip .num{
+    font-family:"JetBrains Mono",ui-monospace,monospace; font-size:13px; color:var(--ink-3);
+    font-variant-numeric:tabular-nums; padding-top:3px;
+  }
+  .tip.is-done .num{color:var(--done)}
+  .tip.is-here .num{color:var(--accent)}
+  .tip-head{display:flex; gap:12px; align-items:flex-start; justify-content:space-between}
+  .tip h3{font-size:16.5px; font-weight:600; margin:0 0 2px; line-height:1.3; text-wrap:balance}
+  .tip .orig{
+    font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11.5px; color:var(--ink-3);
+    display:block; margin-bottom:10px;
+  }
+  .tip .body{grid-column:2}
+  .tip p{margin:0 0 10px; color:var(--ink-2); max-width:66ch}
+  .tip p strong{color:var(--ink); font-weight:600}
+  .tip code{
+    font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.87em;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:1px 5px;
+  }
+  .tip ul{margin:0 0 10px; padding-left:18px; color:var(--ink-2); max-width:66ch}
+  .tip li{margin-bottom:5px}
+  .tip li::marker{color:var(--accent)}
+
+  .here-badge{
+    font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:700;
+    color:var(--accent-ink); background:var(--accent-soft); border-radius:99px; padding:3px 9px; white-space:nowrap;
+  }
+
+  .snippet{margin:4px 0 12px; border-radius:8px; overflow:hidden; border:1px solid var(--code-line)}
+  .snippet-bar{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background:var(--code-bg); border-bottom:1px solid var(--code-line); padding:6px 10px;
+  }
+  .snippet-bar span{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--code-dim)}
+  .copy{
+    font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10.5px; cursor:pointer;
+    background:transparent; color:var(--code-dim); border:1px solid var(--code-line); border-radius:5px; padding:2px 7px;
+  }
+  .copy:hover{color:var(--code-ink); border-color:var(--code-dim)}
+  .snippet pre{
+    margin:0; padding:12px 14px; background:var(--code-bg); color:var(--code-ink);
+    font-family:"JetBrains Mono",ui-monospace,monospace; font-size:12.5px; line-height:1.6;
+    overflow-x:auto;
+  }
+
+  .note{
+    border-left:2px solid var(--accent); background:var(--accent-soft);
+    padding:10px 14px; border-radius:0 7px 7px 0; margin:2px 0 12px;
+  }
+  .note p{margin:0; color:var(--ink); font-size:13.5px; max-width:64ch}
+  .note .lbl{font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:700; color:var(--accent-ink); display:block; margin-bottom:3px}
+  .note code{background:transparent; border-color:var(--line-strong)}
+
+  .tip-foot{display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; justify-content:space-between; margin-top:12px; padding-top:11px; border-top:1px solid var(--line)}
+  .docs{font-size:12px; color:var(--ink-3)}
+  .docs a{text-decoration:none; border-bottom:1px solid var(--line-strong)}
+  .docs a:hover{border-bottom-color:var(--accent)}
+  .check{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-2); cursor:pointer; user-select:none}
+  .check input{accent-color:var(--done); width:15px; height:15px; cursor:pointer}
+  .tip.is-done .check{color:var(--done); font-weight:600}
+
+  .empty{padding:40px 0; color:var(--ink-3)}
+  .pagefoot{margin-top:64px; padding-top:20px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-3); max-width:66ch}
+  .pagefoot code{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.9em; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:1px 5px}
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 900px){
+    .shell{grid-template-columns:minmax(0,1fr)}
+    .rail{
+      position:static; height:auto; overflow:visible;
+      border-right:0; border-bottom:1px solid var(--line);
+      padding-block:24px 20px; padding-inline:16px;
+    }
+    .nav{max-height:240px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:12px}
+    main{padding-block:32px 72px; padding-inline:16px}
+    .tip{grid-template-columns:minmax(0,1fr); padding:18px}
+    .tip .num{padding-top:0; margin-bottom:2px}
+    .tip .body{grid-column:1}
+  }
+</style>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <span class="glyph">101</span>
+      <span class="who">Campo de treino</span>
+    </div>
+
+    <div class="gauge">
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 32</b></div>
+      <div class="track"><div class="fill" id="gaugeFill"></div></div>
+    </div>
+
+    <input class="search" id="search" type="search" placeholder="Filtrar dicas&hellip;" aria-label="Filtrar dicas">
+
+    <nav class="nav" id="nav" aria-label="Índice de dicas"></nav>
+
+    <div class="rail-foot">
+      <button class="btn" id="themeBtn" type="button">Alternar tema</button>
+      <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
+      <p>Cobertura atual: dicas 1&ndash;32<br>(capítulos 1 a 5)</p>
+    </div>
+  </aside>
+
+  <main>
+    <header class="masthead">
+      <p class="eyebrow">Zenva Academy &middot; guia de campo</p>
+      <h1>101 Dicas de Claude Code</h1>
+      <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
+      <div class="meta">
+        <span>Leitura: <b>dica 32 de 101</b></span>
+        <span>Capítulos cobertos: <b>1 a 5</b></span>
+        <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
+      </div>
+    </header>
+
+    <div id="content"></div>
+    <p class="empty" id="empty" hidden>Nenhuma dica bate com esse filtro.</p>
+
+    <footer class="pagefoot">
+      <p>Conforme você avança no livro, peça a inclusão das próximas dicas. Os dados vivem no array <code>TIPS</code> no topo do script: cada nova dica é um objeto a mais, e o índice, a barra de progresso e o filtro se ajustam sozinhos.</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+const CHAPTERS = [
+  { n: 1, title: "Preparando o Claude Code para trabalho sério",
+    note: "A primeira hora decide os ganhos de longo prazo. São poucas escolhas de setup, e todas compõem ao longo dos meses." },
+  { n: 2, title: "CLAUDE.md e a hierarquia de memória",
+    note: "O arquivo de maior alavancagem do projeto, e o que a maioria dos times erra por excesso, não por falta." },
+  { n: 3, title: "Slash commands e skills",
+    note: "A camada onde mora a alavancagem que compõe: todo fluxo codificado como skill vira uma invocação de uma linha para sempre." },
+  { n: 4, title: "Desenhando skills como pipelines de múltiplas fases",
+    note: "As skills que dão conta de trabalho de produção nunca são de prompt único. São pipelines: fases numeradas, portões explícitos de aprovação humana, passos idempotentes e retomada que sobrevive a uma falha no meio do caminho." },
+  { n: 5, title: "Plan mode e trabalho guiado por especificação",
+    note: "Plan mode é o maior ganho de qualidade fácil do Claude Code. A Anthropic relata taxas de sucesso duas a três vezes maiores em tarefas difíceis quando se gasta alguns minutos moldando um plano antes de executar." }
+];
+
+const TIPS = [
+  { n:1, ch:1,
+    title:"Use o instalador nativo para ter auto-update",
+    orig:"Use the native installer for auto-updates",
+    body:`<p>Os instaladores não são equivalentes. Homebrew e WinGet exigem <code>brew upgrade</code> / <code>winget upgrade</code> na mão, e as versões saem com frequência. O instalador nativo se atualiza sozinho: você fica no máximo uma release atrás, não três.</p>`,
+    code:{lang:"PowerShell (Windows)", text:`irm https://claude.ai/install.ps1 | iex\n\n# macOS / Linux / WSL\ncurl -fsSL https://claude.ai/install.sh | bash`},
+    note:{lbl:"Insight", html:`Em ambiente gerenciado, <code>DISABLE_UPDATES=1</code> desliga o auto-updater. Dá para fixar a versão com <code>claude install 2.1.118</code> ou trocar de canal com <code>claude install stable</code> / <code>latest</code>. No Windows nativo, instale também o Git for Windows: sem ele o agente cai no PowerShell, e boa parte dos exemplos da comunidade assume Bash.`},
+    docs:[["Setup","https://code.claude.com/docs/en/setup"]] },
+
+  { n:2, ch:1,
+    title:"Rode /doctor sempre que algo parecer estranho",
+    orig:"Run /doctor whenever something feels off",
+    body:`<p>É o único comando de diagnóstico que vale decorar. Ele checa instalação, settings, configuração de MCP, disponibilidade do ripgrep e estado de contexto, e imprime os achados. Aperte <code>f</code> no prompt e o Claude corrige o que foi reportado.</p><p>Se o Claude Code nem abrir, rode <code>claude doctor</code> direto no shell: mesmas checagens, funciona com a sessão interativa quebrada.</p>`,
+    code:{lang:"terminal", text:`/doctor        # dentro da sessão; depois aperte f para corrigir\nclaude doctor  # fora da sessão, quando nada abre`},
+    docs:[["Troubleshooting","https://code.claude.com/docs/en/troubleshooting"]] },
+
+  { n:3, ch:1,
+    title:"Digite ? para ver os atalhos reais do seu ambiente",
+    orig:"Type ? to see every shortcut for your environment",
+    body:`<p>Os atalhos variam por sistema operacional, emulador de terminal e plugins instalados. Decorar uma lista estática é a estratégia errada: <code>?</code> na caixa de input imprime o que está de fato ligado ali.</p><p>Faça isso na primeira sessão de cada máquina, terminal ou janela do VS Code. É assim que aparecem coisas como <code>Ctrl+G</code> (abrir o prompt no editor externo), <code>Esc Esc</code> (menu de rewind), <code>Ctrl+B</code> (mandar a tarefa para background) e <code>Ctrl+T</code> (alternar a lista de tarefas).</p>`,
+    docs:[["Quickstart","https://code.claude.com/docs/en/quickstart"]] },
+
+  { n:4, ch:1,
+    title:"Configure a status line uma vez, veja o contexto para sempre",
+    orig:"Configure the status line once, see context usage forever",
+    body:`<p><code>/statusline</code> sem argumentos deixa o agente se configurar a partir do seu prompt de shell. Você também pode descrever em texto corrido o que quer, e ele escreve o script.</p><p>A status line roda local e <strong>não consome tokens de API</strong>. Exibindo o percentual de contexto usado continuamente, você nunca precisa chamar <code>/usage</code>. Ao cruzar 50 a 60%, é hora de compactar, fazer handoff ou limpar, bem antes de o auto-compactor entrar e degradar a qualidade.</p>`,
+    code:{lang:"prompt", text:`/statusline mostre o modelo, o branch do git, arquivos sujos\ne o percentual de contexto usado`},
+    docs:[["Statusline","https://code.claude.com/docs/en/statusline"]] },
+
+  { n:5, ch:1,
+    title:"Defina as variáveis de ambiente de alta alavancagem no dia um",
+    orig:"Set a few high-leverage environment variables on day one",
+    body:`<p>Coloque no profile do shell para valer em toda sessão futura:</p>
+    <ul>
+      <li><code>CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=1</code> mantém o diretório de trabalho fixo na raiz do projeto entre chamadas de Bash. Sem isso, o agente se perde com frequência.</li>
+      <li><code>DISABLE_UPDATES=1</code> para ambientes gerenciados em que o TI fixa versões.</li>
+      <li><code>ENABLE_PROMPT_CACHING_1H=1</code> opta pelo TTL de cache de uma hora, estendendo o benefício por sessões longas.</li>
+      <li><code>IS_SANDBOX=1</code> ao rodar como root dentro de VM ou container.</li>
+    </ul>
+    <p>Dentro de um CLAUDE.md ou de um hook, conte com <code>$CLAUDE_PROJECT_DIR</code> e <code>$CLAUDE_FILE_PATHS</code> para resolver caminhos: é o que torna hooks portáveis entre máquinas.</p>`,
+    note:{lbl:"Insight", html:`Variáveis de ambiente são a fonte de configuração de <strong>menor</strong> precedência, abaixo de <code>settings.json</code> e das flags de linha de comando. A ordem é intencional: env é o lugar das preferências "sempre ligadas"; settings e flags são o lugar dos overrides por projeto ou por execução.`},
+    docs:[["Settings","https://code.claude.com/docs/en/settings"]] },
+
+  { n:6, ch:2,
+    title:"Mantenha o CLAUDE.md do projeto abaixo de 1.000 tokens",
+    orig:"Keep the project CLAUDE.md under 1,000 tokens",
+    body:`<p>Um CLAUDE.md raiz útil tem por volta de <strong>50 linhas</strong>: uma linha sobre o projeto e a stack, o punhado de comandos que importam (test, build, deploy), onde vivem estado e segredos, e os arquivos que o Claude nunca deve modificar. Mais que isso é sinal de que o arquivo virou depósito do que pertence a skills, hooks ou regras com escopo de caminho.</p><p>O time do Claude Code na Anthropic poda o próprio CLAUDE.md a cada release de modelo, porque modelos mais espertos precisam de menos tutela. Para cada regra que der vontade de adicionar, pergunte: <em>remover essa regra causaria um erro que eu já vi acontecer?</em> Se não, corte.</p>`,
+    docs:[["Memory","https://code.claude.com/docs/en/memory"]] },
+
+  { n:7, ch:2,
+    title:"Quando o Claude erra a mesma coisa duas vezes, vira linha no CLAUDE.md",
+    orig:"When Claude makes the same mistake twice, add a CLAUDE.md line",
+    body:`<p>É a ação corretiva de maior alavancagem. Erro isolado continua isolado; erro recorrente vira entrada no CLAUDE.md. <strong>O gatilho é a segunda ocorrência, não a primeira</strong> — nada de carregar o arquivo com regras hipotéticas.</p><p>Truque útil: no fim da conversa de correção, diga <em>"atualize o CLAUDE.md para isso não acontecer de novo"</em>. O Claude redige a regra, anexa no arquivo, e você revisa a redação antes de salvar.</p>`,
+    docs:[["Memory","https://code.claude.com/docs/en/memory"]] },
+
+  { n:8, ch:2,
+    title:"Gere o primeiro CLAUDE.md com /init, depois reconstrua do zero",
+    orig:"Generate the first CLAUDE.md with /init, then rebuild from scratch",
+    body:`<p>Começar de uma página em branco é desperdício: <code>/init</code> analisa o projeto e produz um esqueleto útil em segundos. A parte menos óbvia vem depois. Se o CLAUDE.md foi gerado meses atrás e acumulou entulho, muitas vezes vale <strong>apagar e reconstruir</strong>. Isso força a pensar de novo no que realmente pertence ali: convenções velhas saem, regras que não se aplicam mais ao modelo atual são cortadas.</p><p>Se <code>/init</code> falhar por autenticação, rode <code>/login</code> antes. O arquivo gerado é ponto de partida, não artefato pronto: leia e edite antes de commitar.</p>`,
+    docs:[["Memory","https://code.claude.com/docs/en/memory"]] },
+
+  { n:9, ch:2,
+    title:"Use a hierarquia de três níveis: global, projeto, pessoal",
+    orig:"Use the three-tier hierarchy: global, project, personal",
+    body:`<ul>
+      <li><code>~/.claude/CLAUDE.md</code> — global, abaixo de 15 linhas. Hábitos entre projetos ("sempre pnpm, nunca npm", "prefira rg a grep").</li>
+      <li><code>.claude/CLAUDE.md</code> ou <code>CLAUDE.md</code> na raiz — convenções do time, commitado no git.</li>
+      <li><code>CLAUDE.local.md</code> (no gitignore) — overrides pessoais ("rode meu linter de pre-push", "escreva a mensagem de commit mas nunca dê push").</li>
+    </ul>
+    <p>O erro mais comum é <strong>duplicar a mesma regra entre níveis</strong>. Repetição gasta o orçamento de atenção. Cada nível tem um público só: o você-futuro em todos os projetos, o time neste projeto, ou o você-atual. Uma regra pertence a exatamente um nível.</p>
+    <p>Em monorepos, adicione CLAUDE.md por pasta: o loader ciente de caminho só os carrega quando o Claude trabalha naquele subdiretório.</p>`,
+    docs:[["Memory","https://code.claude.com/docs/en/memory"]] },
+
+  { n:10, ch:2,
+    title:"Use comentários HTML como notas de manutenção grátis",
+    orig:"Use HTML comments for free maintainer notes",
+    body:`<p>O CLAUDE.md chega ao Claude como mensagem de usuário, mas comentários HTML de bloco são <strong>removidos antes da injeção</strong>. Ou seja: notas para você mesmo a custo zero de token.</p><p>Use sempre que uma regra tiver justificativa não óbvia. O arquivo apodrece muito mais rápido quando ninguém lembra por que a regra foi criada.</p>`,
+    code:{lang:"CLAUDE.md", text:`- Use bun, not npm. Always.\n  <!-- npm 10.x tem um bug de postinstall que trava o monorepo.\n       Ver incidente #482 para contexto. -->`},
+    docs:[["Memory","https://code.claude.com/docs/en/memory"]] },
+
+  { n:11, ch:2,
+    title:"Use regras com escopo de caminho para convenções de módulo",
+    orig:"Use path-scoped rules for module-specific conventions",
+    body:`<p>Arquivos <code>.claude/rules/*.md</code> com um glob em <code>paths:</code> no frontmatter só carregam quando o Claude mexe em arquivos que casam. É assim que o CLAUDE.md continua pequeno sem abrir mão de convenções rígidas em partes específicas do código.</p><p>A regra abaixo só entra em contexto enquanto o Claude toca código de API. Nos outros 90% do tempo, esses tokens não estão lá.</p>`,
+    code:{lang:".claude/rules/api.md", text:`---\npaths: ["src/api/**/*.ts"]\n---\n# API conventions\n- All endpoints return discriminated-union errors, not thrown exceptions.\n- Use the \`RouteContext\` helper from \`src/api/context.ts\`.\n  Do not parse req.body directly.\n- Auth runs in middleware; do not re-check tokens inside handlers.`},
+    docs:[["Memory","https://code.claude.com/docs/en/memory"]] },
+
+  { n:12, ch:2,
+    title:"Adicione uma seção Project Boundaries com In-Scope e Out-of-Scope",
+    orig:"Add a Project Boundaries section with In-Scope and Out-of-Scope lists",
+    body:`<p>A melhor coisa para impedir over-engineering é dizer explicitamente o que <strong>não</strong> faz parte do projeto: uma seção curta no topo do CLAUDE.md, com duas listas.</p><p>A lista de fora de escopo é a metade que se paga. Sem ela, um pedido como "melhore o editor de slides" leva o agente a quatro horas de toca de coelho adicionando contas de usuário, porque "melhorar" era aberto e o modelo queria ajudar. A lista de out-of-scope tende a ser <strong>mais longa</strong> que a de in-scope: o que está dentro já está implícito no código; o que está fora só existe se você escrever.</p>`,
+    code:{lang:"CLAUDE.md", text:`## Project boundaries\n\n**In scope:**\n- Slide-deck generation from a prompt\n- Local PDF and HTML export\n- Single-user, no accounts\n\n**Out of scope:**\n- Authentication or user accounts\n- A database or any persistent backend\n- Real-time collaborative editing\n- Custom themes or skins\n- PowerPoint as an input format\n- Internationalization\n- Server-side rendering`} },
+
+  { n:13, ch:2,
+    title:"Adicione uma seção Environment Facts com fatos duros do sistema",
+    orig:"Add an Environment Facts section with hard system facts",
+    body:`<p>Uma tabelinha com os detalhes concretos e verificáveis que o agente não consegue inferir do código: SO, shell, versões de runtime, Docker, qualquer coisa que decida quais comandos vão funcionar.</p><p>A linha que mais importa é o <strong>"do not scan for it"</strong>. Sem ela, o Claude gasta chamadas de ferramenta sondando por coisas ausentes e depois propõe um caminho que depende delas.</p><p>Peça para ele gerar: <em>"Detecte os runtimes relevantes nesta máquina e escreva a tabela Environment Facts do CLAUDE.md. Diga qual shell usar para comandos do projeto e quais ferramentas eu não tenho, para adicionarmos a linha 'do not scan for'."</em> O resultado é mais preciso que o escrito à mão, porque ele de fato roda a detecção.</p>`,
+    code:{lang:"CLAUDE.md", text:`## Environment facts\n\n| Fact            | Value                                  |\n|-----------------|----------------------------------------|\n| OS              | Windows 11 (PowerShell 7.4 + Git Bash) |\n| Default shell   | Git Bash for project commands          |\n| Node            | 20.11.0                                |\n| Python          | not installed (do not scan for it)     |\n| Docker          | available                              |\n| Package manager | pnpm 9 (do not use npm or yarn)        |`} },
+
+  { n:14, ch:3,
+    title:"Se você reescreve o mesmo prompt longo, empacote como skill",
+    orig:"If you find yourself rewriting the same long prompt, package it as a skill",
+    body:`<p>A regra de ativação: a primeira vez que você escreve um prompt longo e especializado é um caso isolado. A segunda é coincidência. <strong>A terceira é um fluxo de trabalho</strong>, e aí vira skill.</p><p>A barra é alta de propósito. Construir skills especulativamente produz um cemitério de <code>/foo</code> que ninguém roda. Esperar a terceira ocorrência mantém a coleção enxuta e a taxa de acerto alta.</p><p>Ao cruzar o limiar, abra <code>.claude/skills/&lt;nome&gt;/SKILL.md</code> e escreva uma primeira versão mínima: frontmatter, um parágrafo de descrição, um procedimento numerado. Refine nas próximas execuções, não antes.</p>`,
+    note:{lbl:"Contexto", html:`A Anthropic unificou comandos customizados e skills: tanto <code>.claude/commands/foo.md</code> quanto <code>.claude/skills/foo/SKILL.md</code> produzem um comando <code>/foo</code>. Skills adicionam estrutura — frontmatter, scripts embarcados, layout de pasta, progressive disclosure — e são a escolha para qualquer coisa maior que um prompt templado.`} },
+
+  { n:15, ch:3,
+    title:"Mantenha o frontmatter do SKILL.md mínimo",
+    orig:"Keep SKILL.md frontmatter minimal",
+    body:`<p>Todo SKILL.md tem o mesmo formato: apenas <code>name</code> e <code>description</code>. Sem <code>version</code>, sem <code>author</code>, sem <code>tags</code>. O Claude só usa nome e descrição para decidir quando carregar a skill; o resto é passivo de manutenção que envelhece mal.</p><p>A descrição é onde está o trabalho. Uma frase com três tarefas: <strong>nomear a entrada</strong> ("a partir de um card do Trello com tag"), <strong>nomear a saída</strong> ("uma campanha de e-mail em rascunho na fila") e <strong>nomear uma restrição desambiguadora</strong> que diga quando não carregar ("apenas para e-mails promocionais, não para templates transacionais").</p>`,
+    code:{lang:"SKILL.md", text:`---\nname: skill-name\ndescription: One sentence that names the input, the output, and one\n  disambiguating constraint.\n---`} },
+
+  { n:16, ch:3,
+    title:"Escreva descrições de SKILL.md em terceira pessoa, com gatilhos explícitos",
+    orig:"Write SKILL.md descriptions in third person, with explicit triggers",
+    body:`<p>A orientação da própria Anthropic é clara: terceira pessoa ("This skill should be used when the user asks to schedule a video") funciona melhor que segunda pessoa ("Use this skill when you want to…"). O motivo é que o Claude lê a descrição como <strong>metadado sobre a skill</strong>, não como instrução para si, e a terceira pessoa combina com esse enquadramento.</p><p>Liste também as frases-gatilho que os usuários realmente digitam, logo no topo do SKILL.md. Frases literais dão ao auto-loader algo concreto para casar, em vez de palavras-tema abstratas.</p>`,
+    code:{lang:"SKILL.md", text:`description: This skill should be used when the user asks to schedule\n  a video upload to a YouTube channel.\n\n# Triggers\n- "Schedule the new tutorial video for Friday"\n- "Queue this video for next Tuesday at 2pm"`},
+    docs:[["Skills","https://code.claude.com/docs/en/skills"]] },
+
+  { n:17, ch:3,
+    title:"Use progressive disclosure: metadado, corpo, referências",
+    orig:"Use progressive disclosure: metadata, body, references",
+    body:`<p>Um SKILL.md de 5.000 palavras carrega muito contexto não usado toda vez que dispara. A estrutura recomendada tem três camadas:</p>
+    <ul>
+      <li><strong>Camada 1, metadado.</strong> Sempre carregado: frontmatter e descrição.</li>
+      <li><strong>Camada 2, corpo do SKILL.md.</strong> Carregado quando a skill dispara. Alvo de 1.500 a 2.000 palavras, teto duro de 5.000.</li>
+      <li><strong>Camada 3, arquivos de referência.</strong> Carregados sob demanda pelo Claude durante o procedimento. Ficam em <code>references/</code> ao lado do SKILL.md.</li>
+    </ul>
+    <p>Personas, guias de estilo, exemplos longos e material verboso vão para <code>references/</code>. E escreva o SKILL.md no <strong>imperativo ou infinitivo</strong> ("Configure o servidor MCP", "Pare e pergunte ao usuário") em vez de segunda pessoa: lê mais como procedimento e usa menos tokens.</p>`,
+    code:{lang:"estrutura", text:`.claude/skills/minha-skill/\n├── SKILL.md        # camadas 1 e 2\n└── references/     # camada 3, sob demanda\n    ├── persona.md\n    └── style-guide.md`},
+    docs:[["Skills","https://code.claude.com/docs/en/skills"]] },
+
+  { n:18, ch:3,
+    title:"Use o frontmatter paths: para definir quando a skill carrega sozinha",
+    orig:"Use paths: frontmatter to scope when a skill auto-loads",
+    body:`<p>O campo <code>paths:</code> aceita um glob e diz ao Claude para <strong>só considerar essa skill quando o usuário estiver trabalhando em arquivos que casam</strong>. Para skills amarradas a um tipo de arquivo, é assim que elas ficam fora das sessões que não têm nada a ver.</p><p>No exemplo, a skill é invisível enquanto você mexe em <code>.py</code> ou <code>.go</code>, e está presente sem precisar pedir quando você abre um <code>.tsx</code>. Isso mantém afiada a consciência do Claude sobre a sua coleção de skills, em vez de soterrar toda sessão sob descrições de ferramentas irrelevantes.</p>`,
+    code:{lang:"SKILL.md", text:`---\nname: react-component-review\ndescription: Reviews a React component for our standard accessibility,\n  performance, and design-system constraints.\npaths: ["**/*.tsx"]\n---`},
+    note:{lbl:"Par com a dica 11", html:`É a mesma ideia do <code>paths:</code> nas regras de <code>.claude/rules/</code>, aplicada à camada de skills. Escopo por caminho é o mecanismo geral do Claude Code para manter contexto fora do caminho até o momento em que ele é relevante.`},
+    docs:[["Skills","https://code.claude.com/docs/en/skills"]] },
+
+  { n:19, ch:3,
+    title:"Use disable-model-invocation em skills com efeito colateral",
+    orig:"Use disable-model-invocation for side-effecting skills",
+    body:`<p>Algumas skills nunca deveriam disparar sozinhas porque suas ações são irreversíveis: fazer deploy, publicar, enviar e-mail, agendar vídeo. A flag <code>disable-model-invocation: true</code> deixa a skill <strong>manual-only</strong>: dá para invocar como <code>/nome-da-skill</code>, mas o Claude não a escolhe automaticamente a partir da conversa. Ela também <strong>tira a descrição da skill do contexto</strong> até a invocação, então uma coleção de skills perigosas não gasta atenção nas sessões em que ninguém vai usá-las.</p><p>A regra de bolso: <em>se rodar a skill coloca algo na frente de clientes, custa dinheiro ou muda estado externo, ela é de invocação manual</em>.</p><p>Combine com <code>allowed-tools</code> no frontmatter, para a skill pré-aprovar o conjunto estreito de ferramentas que realmente usa. Isso corta prompts de permissão durante a execução <strong>sem alargar o raio de explosão fora da skill</strong>: a concessão vale só pelo turno da invocação e expira na sua próxima mensagem.</p>`,
+    code:{lang:"SKILL.md", text:`---\nname: deploy\ndescription: Deploys the built app to production.\ndisable-model-invocation: true\nallowed-tools: Bash(git push *), Bash(kubectl apply *)\n---`},
+    note:{lbl:"Concede, não restringe", html:`O nome <code>allowed-tools</code> engana: ele <strong>pré-aprova</strong> o que está na lista, e não limita a skill ao que está na lista. Toda ferramenta de fora continua chamável — só volta a passar pelas suas regras normais de permissão, com prompt na tela. Quem <em>remove</em> ferramentas do alcance é o campo irmão <code>disallowed-tools</code> (também até a sua próxima mensagem) ou uma regra <code>deny</code> no settings. Um detalhe de segurança: o diálogo de confiança que aparece ao abrir uma pasta nova <strong>não cobre esse campo</strong>. Recusar a confiança faz o Claude Code ignorar os hooks e as permissões do <code>settings.json</code> do repo, mas o <code>allowed-tools</code> de uma skill vale assim que você digita <code>/nome-da-skill</code>. Ou seja: antes de rodar a skill de um repo alheio, abra o SKILL.md e leia o frontmatter. <strong>O diálogo de confiança protege você do que o repositório faz por conta própria; ele não protege você do que uma skill faz quando você mesmo a chama.</strong>`},
+    docs:[["Skills","https://code.claude.com/docs/en/skills"]] },
+
+  { n:20, ch:3,
+    title:"Use crase-exclamação para injetar saída de shell ao vivo",
+    orig:"Use backtick-bang to inject live shell output into skills and commands",
+    body:`<p><strong>A ideia em uma frase:</strong> você escreve um comando dentro do arquivo da skill, e o Claude Code roda esse comando e troca ele pelo resultado <em>antes</em> de o Claude ler o arquivo.</p><p>São três pedaços: um <code>!</code>, uma crase, o comando, outra crase. O Claude nunca vê o comando — ele já recebe a resposta no lugar, como uma lacuna preenchida antes de a folha ser entregue.</p><p>Sem a injeção, ele teria que pensar "preciso saber o branch", chamar o Bash e esperar. Com ela, esses passos não existem: a informação já estava lá quando ele começou a ler. E como o prompt tem o mesmo formato toda vez, o cache de prompt continua quente.</p><p>Para comandos de várias linhas, use um bloco cercado aberto com <code>\`\`\`!</code> em vez da forma inline.</p>`,
+    code:[
+      {lang:"antes e depois", text:`No SKILL.md você escreve:\n  Branch: !\`git branch --show-current\`\n\nO Claude recebe:\n  Branch: main`},
+      {lang:"skill mínima para testar", text:`---\nname: estado\ndescription: Mostra o estado do projeto.\n---\n\nHoje é !\`date\` e o branch é !\`git branch --show-current\`.`},
+      {lang:"SKILL.md — exemplo do livro", text:`Branch atual: !\`git branch --show-current\`\nArquivos alterados: !\`git diff --stat\`\nÚltimos commits: !\`git log --oneline -5\`\n\nPlaneje uma mensagem de commit com base no diff acima.\nSiga o estilo dos commits recentes.`}
+    ],
+    note:{lbl:"Detalhes que mordem", html:`A substituição roda <strong>uma vez só</strong> sobre o arquivo original: a saída de um comando não é reescaneada, então um comando não consegue emitir outro placeholder. O <code>!</code> só é reconhecido no começo da linha ou logo após um espaço — em <code>KEY=!\`cmd\`</code> ele vira texto literal e nada roda. Os comandos usam o diretório atual da sessão, que se move quando o Claude dá <code>cd</code>; para caminhos estáveis use <code>\${CLAUDE_PROJECT_DIR}</code> ou <code>\${CLAUDE_SKILL_DIR}</code>. Cada comando tem o timeout de 2 minutos do Bash, e um comando que falha <strong>aborta a invocação inteira</strong>. Combine com <code>allowed-tools</code> (dica 19), senão cada injeção para para pedir permissão.`},
+    docs:[["Skills","https://code.claude.com/docs/en/skills"]] },
+
+  { n:21, ch:3,
+    title:"Estruture o SKILL.md como Purpose, Workflow, Rules, Output",
+    orig:"Structure SKILL.md as Purpose, Workflow, Rules, Output",
+    body:`<p>Para qualquer skill que faça mais que um prompt de uma tacada só, o corpo cai naturalmente em quatro seções depois do frontmatter:</p>
+    <ul>
+      <li><strong>Purpose.</strong> Um parágrafo sobre o que a skill faz e <em>quando não usá-la</em>.</li>
+      <li><strong>Workflow.</strong> Passos numerados. Cada passo com precondição clara e saída clara.</li>
+      <li><strong>Rules.</strong> As restrições que o modelo tem que respeitar do começo ao fim: ações proibidas, saídas obrigatórias, o que escalar para o usuário.</li>
+      <li><strong>Output format.</strong> Exatamente o que a skill produz no fim, no formato que as ferramentas seguintes esperam.</li>
+    </ul>
+    <p>A seção de Output format é <strong>a que a maioria dos times pula, e a que dá o maior ganho de qualidade</strong>. Sem ela, cada execução produz um resultado com formato um pouco diferente, o que torna a skill difícil de encadear em outras automações. Com ela, o formato é o mesmo toda vez, mesmo quando as entradas variam muito.</p>
+    <p>Trate cada título de seção como elemento estrutural que carrega peso: o Claude lê a estrutura e a usa. Corpos de SKILL.md em texto livre tendem a produzir resultados em texto livre.</p>`,
+    code:[
+      {lang:"esqueleto do corpo", text:`# Nome da skill\n\n## Purpose\nO que faz, e quando NÃO usar.\n\n## Workflow\n1. **Passo.** Precondição: ... Saída: ...\n2. **Passo.** Precondição: ... Saída: ...\n\n## Rules\n- Nunca <ação proibida>.\n- Sempre <saída obrigatória>.\n- Parar e perguntar quando <condição>.\n\n## Output format\n\`\`\`\nCAMPO: <valor>\nVEREDITO: <ok | corrigir antes>\n\`\`\``},
+      {lang:"Output format — o da /nova-dica deste projeto", text:`DICA: <n> — <título>\nCAMPOS: body <ok> | code <n blocos> | note <sim/não> | docs <n>\nMARCADOR: here movido de <n-1> para <n>\nCONTADORES: <ok | divergência>\nREVISÃO: <veredito de /revisar-pagina-dicas>\nPENDÊNCIAS: <nenhuma | lista>`}
+    ],
+    note:{lbl:"Por que funciona", html:`As quatro seções respondem a quatro perguntas que o modelo faria sozinho, e em ordem: <em>isto é para mim?</em> (Purpose), <em>qual o próximo passo?</em> (Workflow), <em>o que eu não posso fazer?</em> (Rules), <em>como eu termino?</em> (Output). Uma skill sem Output format termina quando o modelo achar que terminou — e é por isso que duas execuções da mesma skill devolvem coisas diferentes.`} },
+
+  { n:22, ch:3,
+    title:"Mantenha cada skill com um propósito só, e encadeie",
+    orig:"Keep skills single-purpose and chain them",
+    body:`<p>As skills que envelheceram melhor na coleção do time são as que fazem <strong>uma coisa</strong>.</p>
+    <p>O exemplo prático do livro: quando um vídeo está pronto para ser agendado num canal, a skill de agendamento faz o upload, a descrição, a playlist, o horário e a validação de fuso. Ela <em>não</em> clona também o card de acompanhamento no Trello — isso é uma segunda skill, minúscula, que existe por conta própria, e a de agendamento a chama como passo seguinte. Se o fluxo do Trello for trocado amanhã, só a skill pequena muda; a de agendamento fica intacta.</p>
+    <p>A mesma ideia atravessa o resto da automação: uma skill que renderiza diagramas é invocada por fluxos maiores quando um diagrama é necessário; uma skill de publicação de conteúdo é composta de skills menores, cada uma cuidando de uma etapa da cadeia.</p>
+    <p>A regra de decisão: <strong>quando bater a tentação de embutir uma subtarefa dentro da skill pai, extraia para uma skill irmã ou para um script compartilhado</strong>. Assim cada skill continua pequena o suficiente para ser lida numa sentada, e a skill pai vira uma coordenadora em vez de um monolito.</p>
+    <p>A variante de infraestrutura compartilhada: quando duas skills próximas precisam das mesmas dependências de Node, uma delas é dona do <code>node_modules/</code> e a outra usa um shim pequeno para resolver os módulos a partir da irmã. Isso evita <code>npm install</code> duplicado e mantém as versões alinhadas.</p>`,
+    note:{lbl:"Insight: skills são observadas ao vivo", html:`Adicionar ou editar uma skill vale <strong>dentro da sessão atual</strong>, sem reiniciar o Claude Code: salve o SKILL.md, invoque de novo, e a versão nova roda. Três ressalvas que a doc acrescenta ao livro: a observação ao vivo cobre <strong>o texto do SKILL.md apenas</strong> (numa skill que também é plugin, mudanças em <code>hooks/</code>, <code>.mcp.json</code>, <code>agents/</code> e <code>output-styles/</code> exigem <code>/reload-plugins</code>); ela não acontece em <a href="https://code.claude.com/docs/en/headless" target="_blank" rel="noopener">bare mode</a>; e se você criar um diretório de skills de topo que não existia quando a sessão começou, aí sim é preciso reiniciar para que ele passe a ser observado.`} },
+
+  { n:23, ch:4,
+    title:"Numere suas fases e declare a precondição e a saída de cada uma",
+    orig:"Number your phases and declare each one’s preconditions and outputs",
+    body:`<p>A estrutura de abertura de toda skill de vários passos é uma <strong>lista numerada de fases</strong>, cada uma com entradas e saídas explícitas.</p>
+    <p>Fases numeradas com interfaces explícitas servem a três propósitos: dão ao Claude um ponto de partida inequívoco na hora de retomar; dão ao usuário um indicador aproximado de progresso ("estamos na fase 3 de 6"); e tornam trivial perceber quando uma saída intermediária está faltando — que é justamente o que a retomada idempotente usa.</p>
+    <p>O efeito colateral útil: quando uma fase falha e a skill é executada de novo, o Claude procura as saídas nomeadas de cada fase anterior e <strong>pula direto para a primeira que está faltando</strong>.</p>
+    <p>Os números não são enfeite. Eles são o índice que comanda a retomada.</p>`,
+    code:{lang:"SKILL.md", text:`## Phase 0: Collect inputs from the user\n**Inputs:** the source identifier, the target environment, optional links\n**Outputs:** a populated cache file that the next phase can read\n\n## Phase 1: Run the generation pipeline\n**Inputs:** the cache file from phase 0\n**Outputs:** a folder of edited material ready for review`},
+    note:{lbl:"Como se liga à dica 21", html:`A dica 21 dá as quatro seções do corpo — Purpose, Workflow, Rules, Output. Esta aqui detalha o interior do <strong>Workflow</strong> quando ele é grande demais para uma lista simples de passos: cada passo vira uma fase com nome, entrada e saída declaradas. Skill pequena continua com passos; skill de produção vira pipeline.`} },
+
+  { n:24, ch:4,
+    title:"Use portões de aprovação humana nomeados, com marcador STOP explícito",
+    orig:"Use named human-approval gates with explicit STOP markers",
+    body:`<p>Para qualquer pipeline que produza algo com que você vai ter que conviver depois, insira <strong>portões de aprovação nomeados</strong>. O padrão é simples, mas rígido.</p>
+    <p>A linha <em>"não importa quão limpas as entradas pareçam"</em> não é redundante. Sem ela, o Claude trata uma execução tranquila como aprovação implícita e pula o portão. Com ela, a parada é dura toda vez, e cabe ao usuário liberar a passagem.</p>
+    <p>A versão usada numa skill que agenda conteúdo público é ainda mais estrita: <em>"não chame a ferramenta de agendamento antes de o usuário confirmar, não importa quão claras fossem as entradas"</em>. Essa linha nasceu de uma execução em que o agente se auto-aprovou porque nada parecia errado — o erro foi pego a tempo, mas por pouco.</p>
+    <p><strong>O custo de uma parada desnecessária é alguns segundos de conversa. O custo de um portão perdido é um tweet, um vídeo ou um e-mail caindo em público antes da hora.</strong></p>`,
+    code:{lang:"SKILL.md", text:`**Gate 1: Research approval**\nSTOP at gate 1. Show the user the populated \`facts/\` and\n\`competitor-analysis/\` trees. Wait for the user to approve before\nproceeding to the next phase.\n\nDo not proceed without explicit approval, no matter how clean the\ninputs look.`},
+    note:{lbl:"Portão é instrução, trava é outra coisa", html:`Um gate escrito em prosa é lido pelo modelo como instrução — forte, mas ainda instrução. A trava correspondente no Claude Code é <code>disable-model-invocation</code> (dica 19), para a skill não disparar sozinha, e regras <code>deny</code> nas permissões, para o comando não rodar. Num pipeline que toca o mundo lá fora, escreva os dois: o portão explica <em>por que</em> parar, a trava garante que parou.`} },
+
+  { n:25, ch:4,
+    title:"Anexe um bloco “Approved YYYY-MM-DD” aos artefatos aprovados",
+    orig:"Append an “Approved YYYY-MM-DD” block to gated artifacts",
+    body:`<p>Depois que o usuário aprova um artefato num portão — um dump de pesquisa, um sumário, uma agenda em rascunho — anexe ao <strong>próprio artefato</strong> uma seção registrando a data da aprovação e o conteúdo final aprovado.</p>
+    <p>Esse bloco pós-portão <strong>passa a ser a nova fonte de verdade</strong>. As fases seguintes leem da estrutura aprovada, não do rascunho pré-aprovação.</p>
+    <p>E a aprovação fica durável: ela sobrevive à sessão de chat, à compactação de contexto e a qualquer remanejamento de arquivos. Se uma fase precisar rodar de novo semanas depois, a aprovação continua lá.</p>
+    <p>O benefício colateral é a trilha de auditoria. Olhando a pasta do projeto seis meses depois, dá para ver exatamente o que foi aprovado e quando — em vez de reconstruir isso a partir do histórico do git ou de transcrições de conversa.</p>`,
+    code:{lang:"artefato aprovado", text:`## Approved 2026-05-07\n- 12 lessons, 4 quizzes\n- Final ordering: cloud concepts, identity, compute, networking,\n  storage, monitoring, governance, cost, security, networking deep\n  dive, reliability, exam prep`},
+    note:{lbl:"Por que em disco, e não no chat", html:`A dica diz que a aprovação sobreviveu "à sessão de chat e à compactação". É o mesmo motivo pelo qual a dica 23 insiste em saídas em arquivo: contexto de conversa é volátil, arquivo não é. Um "pode publicar" dito no chat vale até a próxima compactação; um bloco <code>## Approved 2026-09-16</code> num arquivo vale enquanto o arquivo existir.`} },
+
+  { n:26, ch:4,
+    title:"Use uma pasta de saída por execução, para runs paralelos nunca colidirem",
+    orig:"Per-job output folders so parallel runs never collide",
+    body:`<p>Toda skill de execução longa escreve a saída numa pasta específica do trabalho, em <code>output/&lt;skill&gt;/&lt;jobId&gt;/</code>. O <code>jobId</code> varia conforme a skill: pode ser um id numérico de um sistema interno, um slug, um timestamp <code>YYYYMMDD-HHMMSS</code>, ou o nome do tema em kebab-case. <strong>O formato do caminho é constante.</strong></p>
+    <p>Na prática isso significa três coisas. Primeiro, duas pessoas do time podem rodar a mesma skill contra trabalhos diferentes sem colidir. Segundo, dá para amostrar saídas anteriores navegando a pasta — incomparavelmente mais fácil que ler logs de conversa. Terceiro, quando a skill precisa encontrar trabalho anterior, ela tem um caminho determinístico para checar.</p>
+    <p>E proíba a skill de escrever em qualquer lugar fora da pasta de saída dela. O SKILL.md diz, com essas palavras: <em>"Do not write anywhere else in the project."</em> Isso mantém o raio de explosão da skill limitado, e protege o resto do repositório de uma skill que se perdeu.</p>`,
+    code:{lang:"layout de saída", text:`output/<skill>/<jobId>/\n├── agendar-video/20260916-142233/\n├── agendar-video/curso-aws-modulo-3/\n└── publicar-post/8821/\n\n# no SKILL.md:\nDo not write anywhere else in the project.`},
+    note:{lbl:"O que este projeto faz diferente", html:`Aqui o pipeline da <code>/nova-dica</code> usa <code>output/nova-dica/dica-NN/</code> — o número da dica como <code>jobId</code>. Serve para separar dicas, mas <strong>não</strong> para o que a dica 26 promete: duas execuções da <em>mesma</em> dica ainda escrevem uma sobre a outra. Um <code>jobId</code> de timestamp resolveria; o custo é perder o caminho previsível de que a retomada depende. A dica 28 fecha essa escolha, com o diálogo "Reset / Resume".`} },
+
+  { n:27, ch:4,
+    title:"Faça cada passo longo ser idempotente e pulável",
+    orig:"Make every long step idempotent and skippable",
+    body:`<p>Dentro de uma fase, cada passo individual deve ser seguro para rodar de novo. O padrão é: <strong>"se o arquivo de saída já existe em disco, pule este passo."</strong></p>
+    <p>Para passos mais substanciais, guarde todos os arquivos intermediários para depuração, e <strong>nunca os apague como parte de uma execução bem-sucedida</strong>. Se uma fase termina e o usuário invoca a skill de novo, as saídas da fase anterior ainda estão lá, a skill as detecta e faz curto-circuito. É essa a fundação sobre a qual a retomada é construída.</p>
+    <p>A exceção: para passos que produzem o artefato final visível ao usuário — uma página publicada, um arquivo de vídeo, um release público —, verifique que o artefato existe e <strong>não está vazio</strong> antes de apagar qualquer pasta <code>temp/</code> associada. É o passo de verificação que protege a limpeza de destruir estado que ainda é necessário.</p>`,
+    code:{lang:"SKILL.md", text:`Write each response to \`raw/lessons/<lessonId>.json\`. Skip if the file\nalready exists.`},
+    note:{lbl:"O jeito de errar isso", html:`"Pular se o arquivo existe" é barato de escrever e caro de errar. Um arquivo <strong>pela metade</strong> — de uma execução que morreu no meio da escrita — conta como existente e faz o passo ser pulado para sempre. A defesa que o próprio livro usa no caso do artefato final, <em>verificar que existe e não está vazio</em>, vale como padrão para qualquer passo cuja saída seja grande. Escrever em arquivo temporário e renomear no fim é a versão forte da mesma ideia.`} },
+
+  { n:28, ch:4,
+    title:"Detecte execuções anteriores e pergunte “Reset ou Resume” antes de começar",
+    orig:"Detect prior runs and ask “Reset / Resume” before starting",
+    body:`<p>Um pipeline de execução longa que sobrescreve a saída anterior automaticamente é um pipeline que <strong>come o trabalho do usuário</strong>. A primeira coisa que toda skill multi-fase faz é detectar se existem artefatos anteriores e perguntar explicitamente.</p>
+    <p><strong>Perguntar é barato. Resetar em silêncio é caro.</strong> Nunca se arrependeram de ter posto o prompt; algumas vezes se arrependeram de tê-lo deixado de fora.</p>
+    <p>Um padrão relacionado: guarde em disco a entrada estruturada do usuário antes de invocar qualquer script longo. Na retomada, o script lê o cache e pula as próprias perguntas interativas — o usuário não precisa redigitar as mesmas respostas. O caminho usado é <code>&lt;jobDir&gt;/.cache/user-input.json</code>, e o script sempre olha lá primeiro.</p>`,
+    code:{lang:"o diálogo, no SKILL.md", text:`The folder \`output/<skill>/<jobId>/\` already contains artifacts from a\nprevious run.\n\nChoose:\n- **Start fresh.** Run the reset script, then proceed.\n- **Resume.** Keep everything in place and pass \`--resume\` to the\n  generation script. Pair with \`--skip-existing\` so completed steps\n  are skipped.\n\nStale output is not, on its own, proof that the user wants to discard\nin-progress work. Ask before resetting.`},
+    note:{lbl:"As flags são do script, não do Claude Code", html:`<code>--resume</code> e <code>--skip-existing</code> no exemplo são flags do script de geração do time do livro, não do Claude Code. Não confundir com <code>claude --resume</code>, que existe e faz outra coisa: retomar uma <strong>sessão</strong>, não um pipeline. A frase que carrega a dica é a última do bloco — <em>saída velha não é, por si só, prova de que o usuário quer descartar trabalho em andamento</em>.`} },
+
+  { n:29, ch:4,
+    title:"Acrescente uma seção “Lessons Learned” ao SKILL.md, e atualize depois de cada execução",
+    orig:"Add a “Lessons Learned” section to SKILL.md, and update it after every run",
+    body:`<p>Toda skill multi-fase tem uma seção "Lessons Learned" perto do fim. Depois de uma execução complicada, você — ou o próprio Claude, a seu pedido — atualiza a seção para refletir o que foi aprendido.</p>
+    <p>A seção serve ao mesmo propósito que o CLAUDE.md de um projeto, mas <strong>com escopo na própria skill</strong>. Erros novos viram regras. As regras acumulam devagar, são podadas de vez em quando, e com o tempo a skill fica mais difícil de estragar.</p>
+    <p>A instrução ao Claude é explícita: <em>"Ao terminar uma execução, revise as seções relevantes desta skill para refletir o que foi aprendido."</em> <strong>Codificar o laço de manutenção dentro do próprio procedimento da skill é o que mantém o arquivo vivo.</strong> Sem isso, a seção congela na versão um e para de importar.</p>`,
+    code:{lang:"SKILL.md", text:`### Lessons Learned\n- **Em dashes hide in image alt text.** Search alt text thoroughly\n  during the polish phase. Easy to miss on a first pass.\n- **Ordered lists need blank lines too.** The Markdown-to-DOCX\n  converter requires blank lines before and after numbered lists, not\n  just bullets.`},
+    note:{lbl:"Ela é o gatilho da dica 17", html:`A seção cresce o corpo da skill, e o corpo tem alvo de 1.500 a 2.000 palavras pela dica 17. Medido neste projeto: a <code>/nova-dica</code> chegou a <strong>1.987 palavras</strong> no instante em que ganhou as Lessons Learned. Ou seja, a dica 29 é o gatilho mais provável para a dica 17 cobrar a mudança para <code>references/</code> — lição é material consultado quando algo dá errado, que é a definição de camada 3.`} },
+
+  { n:30, ch:5,
+    title:"Aperte Shift+Tab para entrar em plan mode, e itere o plano antes de qualquer execução",
+    orig:"Press Shift+Tab twice and iterate the plan before any execution",
+    body:`<p><code>Shift+Tab</code> percorre os modos de permissão até chegar em plan mode. O Claude anuncia que entrou, e a caixa de input reflete o novo estado.</p>
+    <p>O erro que se comete cedo é <strong>tratar o primeiro plano como o plano final</strong>. A alavancagem não está em ter um plano, está em iterar sobre ele. Você contesta, pergunta o que está faltando, propõe alternativas, refina até o plano parecer certo. Só então sai do plan mode e deixa o Claude executar.</p>
+    <p><strong>É no segundo turno que quase todo o valor é criado.</strong> Sem ele, plan mode é só um jeito mais lento de chegar à execução.</p>`,
+    code:{lang:"conversa em plan mode", text:`[Shift+Tab]\nPlan: refactor \`src/auth/\` to use the new sessionStore. List files to\ntouch, the migration order, and a rollback plan.\n\n[Claude propõe um plano]\n\nE os tokens CSRF? O plano não menciona. E a seção de rollback está\nfraca demais.\n\n[Claude revisa]`},
+    note:{lbl:"Três coisas que mudaram desde o livro", html:`<strong>Contar batidas não funciona mais.</strong> O livro diz "duas batidas: default → accept-edits → plan". Hoje os modos são <code>default</code>, <code>acceptEdits</code>, <code>plan</code>, <code>auto</code>, <code>dontAsk</code> e <code>bypassPermissions</code> — o ciclo tem mais paradas, e quantas aparecem depende da sessão. A rota determinística é <code>/plan</code>, prefixando um único prompt. Sair sem aprovar: <code>Shift+Tab</code> de novo.<br><strong>"Read-only" é forte demais.</strong> O que plan mode garante é que as <em>edições</em> ficam bloqueadas até você aprovar o plano — não que nenhum comando rode. O Claude roda comandos de exploração; os que estão fora do conjunto read-only embutido pedem aprovação, ou passam por um classificador quando o auto mode está disponível e <code>useAutoModeDuringPlan</code> está ligado, o que é o padrão.<br><strong>O <code>default</code> chama-se Manual</strong> na CLI e nas extensões.`},
+    docs:[["Permission modes","https://code.claude.com/docs/en/permission-modes"]] },
+
+  { n:31, ch:5,
+    title:"Aperte Ctrl+G para editar o plano no seu editor",
+    orig:"Press Ctrl+G in plan mode to edit the plan in your editor",
+    body:`<p>Plano é texto markdown. Quando o Claude apresenta o plano e pergunta como prosseguir, <code>Ctrl+G</code> abre esse plano no seu editor de texto. Você corrige a redação, reordena passos, apaga seções obviamente erradas e acrescenta os nomes de arquivo e números de linha que o Claude não citou. Salva, volta para o Claude Code, e ele continua a partir do plano editado.</p>
+    <p>É muito mais rápido que pedir ao Claude para revisar o plano três vezes. Em planos longos, editar no vim ou no VS Code, com busca-e-substituição de verdade, é <strong>dramaticamente</strong> mais rápido que uma ida e volta no chat.</p>
+    <p>O mesmo atalho funciona no prompt em modo normal &mdash; essa é a versão que a maioria conhece. A aplicação no plan mode é menos óbvia e mais útil.</p>`,
+    note:{lbl:"Duas precisões da documentação", html:`<strong>"While in plan mode" é frouxo.</strong> O livro sugere um atalho disponível a qualquer instante do plan mode. A documentação coloca o <code>Ctrl+G</code> na seção <em>Review and approve a plan</em>: o momento em que o Claude apresenta o plano e pergunta como prosseguir.<br><strong>O editor não é só o "padrão".</strong> É <code>$VISUAL</code>, com <code>$EDITOR</code> como segunda opção. E <code>externalEditorContext: true</code> (global config, <code>~/.claude.json</code>) faz o buffer abrir com a resposta anterior do Claude em linhas de comentário <code>#</code>, que o Claude Code remove ao salvar &mdash; útil para escrever lendo o que ele disse.`},
+    docs:[["Permission modes","https://code.claude.com/docs/en/permission-modes"],["Settings reference","https://code.claude.com/docs/en/settings-reference"]] },
+
+  { n:32, ch:5, here:true,
+    title:"Quando o Claude reaproveitar um plano velho, diga \"DELETE THE PLAN\" em caixa alta",
+    orig:"When Claude reuses a stale plan, say \"DELETE THE PLAN\" explicitly",
+    body:`<p>Plano é arquivo. O Claude Code escreve os planos em disco &mdash; o diretório é <code>plansDirectory</code>, e o default é <code>~/.claude/plans</code>. O arquivo sobrevive ao fim da sessão.</p>
+    <p>O sintoma que o livro descreve: depois de uma execução bem-sucedida, o Claude às vezes traz de volta um plano de um trabalho anterior porque a tarefa nova <em>vagamente</em> tem a forma da antiga. O resultado é o agente "executando" contra o plano de outra feature.</p>
+    <p>O remédio é desconfortavelmente literal &mdash; e o que importa é a caixa alta <strong>mais</strong> a segunda frase. "Delete the plan" sozinho às vezes é lido como figura de linguagem; a forma em maiúsculas, com o reset explícito, quebra o padrão.</p>`,
+    code:{lang:"prompt", text:`DELETE THE PLAN. START NEW PLAN.\n\nWe are now working on the websocket reconnection bug, not the auth\nrefactor from last week. Plan mode, fresh.`},
+    note:{lbl:"O que é recurso e o que é anedota", html:`<strong>O arquivo sobrevive; o contexto não.</strong> A doc é explícita: "Sessions are independent. Each new session starts with a fresh context window, without the conversation history from previous sessions". O plano em <code>~/.claude/plans</code> persiste como arquivo &mdash; mas nenhuma página documenta o Claude <em>relendo</em> um plano salvo por conta própria, nem casamento por semelhança de tarefa. O sintoma desta dica não está no manual.<br><strong>Não existe comando para apagar o plano.</strong> "DELETE THE PLAN" é técnica de prompt, não recurso, e o "quebra o padrão de forma confiável" é experiência do autor. A rota documentada para recomeçar é <code>Shift+Tab</code> ou prefixar um prompt com <code>/plan</code>; e <code>showClearContextOnPlanAccept: true</code> acrescenta a opção de aprovar o plano <em>e</em> limpar o contexto, começando a implementação a partir do plano sozinho.`},
+    docs:[["Plan mode","https://code.claude.com/docs/en/permission-modes"],["plansDirectory","https://code.claude.com/docs/en/settings-reference"],["Sessions","https://code.claude.com/docs/en/sessions"]] }
+];
+
+/* ---------- render ---------- */
+const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+const content = document.getElementById('content');
+const nav = document.getElementById('nav');
+
+CHAPTERS.forEach(ch => {
+  const tips = TIPS.filter(t => t.ch === ch.n);
+  if (!tips.length) return;
+
+  const sec = document.createElement('section');
+  sec.className = 'chapter';
+  sec.id = 'cap-' + ch.n;
+  sec.innerHTML = `
+    <div class="chapter-head">
+      <span class="cn">CAP ${String(ch.n).padStart(2, '0')}</span>
+      <div>
+        <h2>${ch.title}</h2>
+        <p class="ch-note">${ch.note}</p>
+      </div>
+    </div>
+    <div class="tips"></div>`;
+  const list = sec.querySelector('.tips');
+
+  tips.forEach(t => {
+    const art = document.createElement('article');
+    art.className = 'tip' + (t.here ? ' is-here' : '');
+    art.id = 'dica-' + t.n;
+    art.dataset.search = (t.title + ' ' + t.orig + ' ' + t.body + ' ' +
+      (t.code ? (Array.isArray(t.code) ? t.code : [t.code]).map(b => b.text).join(' ') : '')).toLowerCase();
+
+    const blocos = t.code ? (Array.isArray(t.code) ? t.code : [t.code]) : [];
+    const snippet = blocos.map(b => `
+      <div class="snippet">
+        <div class="snippet-bar">
+          <span>${esc(b.lang)}</span>
+          <button class="copy" type="button" data-copy>Copiar</button>
+        </div>
+        <pre><code>${esc(b.text)}</code></pre>
+      </div>`).join('');
+
+    const note = t.note ? `
+      <div class="note"><span class="lbl">${t.note.lbl}</span><p>${t.note.html}</p></div>` : '';
+
+    const docs = t.docs
+      ? `<span class="docs">Docs: ${t.docs.map(d => `<a href="${d[1]}" target="_blank" rel="noopener">${d[0]}</a>`).join(' &middot; ')}</span>`
+      : '<span class="docs"></span>';
+
+    art.innerHTML = `
+      <span class="num">${String(t.n).padStart(2, '0')}</span>
+      <div class="body">
+        <div class="tip-head">
+          <h3>${t.title}</h3>
+          ${t.here ? '<span class="here-badge">Você está aqui</span>' : ''}
+        </div>
+        <span class="orig">${esc(t.orig)}</span>
+        ${t.body}
+        ${snippet}
+        ${note}
+        <div class="tip-foot">
+          ${docs}
+          <label class="check" for="done-${t.n}"><input type="checkbox" id="done-${t.n}"> Já pratiquei</label>
+        </div>
+      </div>`;
+    list.appendChild(art);
+  });
+
+  content.appendChild(sec);
+
+  const navCh = document.createElement('details');
+  navCh.className = 'nav-chapter';
+  navCh.dataset.cap = ch.n;
+  navCh.open = tips.some(t => t.here);
+  navCh.innerHTML = `<summary><span class="cap-nome">Cap ${ch.n}</span><small data-cap-conta="${ch.n}">&middot; ${tips.length} dicas</small></summary>` +
+    tips.map(t => `<a class="nav-tip${t.here ? ' is-here' : ''}" href="#dica-${t.n}" data-nav="${t.n}">
+        <span class="n">${String(t.n).padStart(2, '0')}</span><span class="t">${t.title}</span></a>`).join('');
+  nav.appendChild(navCh);
+});
+
+/* ---------- abrir o capítulo do link direto ---------- */
+function abrirPorHash() {
+  const h = location.hash;
+  let cap = null;
+  let m = h.match(/^#dica-(\d+)$/);
+  if (m) {
+    const t = TIPS.find(t => String(t.n) === m[1]);
+    if (t) cap = t.ch;
+  }
+  m = h.match(/^#cap-(\d+)$/);
+  if (m) cap = Number(m[1]);
+  if (cap === null) return;
+  const bloco = nav.querySelector('[data-cap="' + cap + '"]');
+  if (bloco) bloco.open = true;
+}
+abrirPorHash();
+addEventListener('hashchange', abrirPorHash);
+
+/* ---------- progresso ---------- */
+const KEY = 'cc101-progresso';
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
+const save = s => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} };
+
+const fillBar = document.getElementById('gaugeFill');
+const countEl = document.getElementById('gaugeCount');
+
+function paint(state) {
+  let done = 0;
+  const porCap = {};
+  TIPS.forEach(t => {
+    const on = !!state[t.n];
+    if (on) done++;
+    porCap[t.ch] = (porCap[t.ch] || 0) + (on ? 1 : 0);
+    const art = document.getElementById('dica-' + t.n);
+    const box = document.getElementById('done-' + t.n);
+    const link = nav.querySelector('[data-nav="' + t.n + '"]');
+    if (box) box.checked = on;
+    if (art) art.classList.toggle('is-done', on);
+    if (link) link.classList.toggle('is-done', on);
+  });
+  nav.querySelectorAll('[data-cap-conta]').forEach(el => {
+    const c = el.dataset.capConta;
+    const total = TIPS.filter(t => String(t.ch) === c).length;
+    const feitas = porCap[c] || 0;
+    el.innerHTML = '&middot; ' + total + (total === 1 ? ' dica' : ' dicas') +
+      (feitas ? ' &middot; <b>' + feitas + (feitas === 1 ? ' praticada' : ' praticadas') + '</b>' : '');
+  });
+  countEl.textContent = done + ' / ' + TIPS.length;
+  fillBar.style.width = (done / TIPS.length * 100) + '%';
+}
+
+let state = load();
+paint(state);
+
+content.addEventListener('change', e => {
+  if (e.target.type !== 'checkbox') return;
+  const n = e.target.id.replace('done-', '');
+  if (e.target.checked) state[n] = true; else delete state[n];
+  save(state);
+  paint(state);
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  state = {};
+  save(state);
+  paint(state);
+});
+
+/* ---------- copiar ---------- */
+content.addEventListener('click', e => {
+  const btn = e.target.closest('[data-copy]');
+  if (!btn) return;
+  const text = btn.closest('.snippet').querySelector('code').textContent;
+  navigator.clipboard.writeText(text).then(
+    () => { btn.textContent = 'Copiado'; setTimeout(() => { btn.textContent = 'Copiar'; }, 1400); },
+    () => { btn.textContent = 'Falhou'; setTimeout(() => { btn.textContent = 'Copiar'; }, 1400); }
+  );
+});
+
+/* ---------- filtro ---------- */
+const empty = document.getElementById('empty');
+document.getElementById('search').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  let visible = 0;
+  document.querySelectorAll('.tip').forEach(art => {
+    const hit = !q || art.dataset.search.includes(q);
+    art.hidden = !hit;
+    if (hit) visible++;
+  });
+  document.querySelectorAll('.chapter').forEach(sec => {
+    sec.hidden = ![...sec.querySelectorAll('.tip')].some(a => !a.hidden);
+  });
+  empty.hidden = visible > 0;
+});
+
+/* ---------- tema ---------- */
+const TKEY = 'cc101-tema';
+try { const saved = localStorage.getItem(TKEY); if (saved) document.documentElement.dataset.theme = saved; } catch (e) {}
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = dark ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem(TKEY, next); } catch (e) {}
+});
+</script>
