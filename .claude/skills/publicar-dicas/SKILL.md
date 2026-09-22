@@ -69,11 +69,27 @@ Primeira execução em 2026-09-22, publicando as dicas 31 e 32.
   é `github.com/andrelaf/claude-101`, e subir o PDF publicaria um livro comercial da
   Zenva. Resolvido acrescentando o arquivo ao `.gitignore`. Ao checar o status, olhar
   também `git remote -v`: o que o passo 2 protege depende de para onde o push vai.
-- **Republicar o artifact custa duas leituras, não uma.** `action: "read"` com `path:
-  "index.html"` baixa o arquivo mas **não** conta como ter visto a versão — a própria
-  resposta diz isso. Para o republish passar é preciso o `read` sem `path` e depois
-  `Read` em todas as linhas do arquivo salvo que ele indica (735 linhas nesta
-  execução). Contar com isso no orçamento de contexto, ou a publicação trava no fim.
+- **Republicar o artifact custa duas leituras — mas só na primeira vez da sessão.**
+  `action: "read"` com `path: "index.html"` baixa o arquivo e **não** conta como ter
+  visto a versão; é preciso o `read` sem `path` e depois `Read` em todas as linhas do
+  arquivo salvo que ele indica (735 linhas na estreia). Da segunda publicação da mesma
+  sessão em diante isso não se repete: a sessão já publicou o artifact, e o
+  `publish` com `url` passa direto. Orçar o custo uma vez por sessão, não uma vez por
+  execução da skill.
+- **A manutenção sempre cai depois do commit, e suja o repositório de novo.** O passo 4
+  commita, e só então esta seção é atualizada — então toda execução termina com o
+  SKILL.md alterado e fora do commit que acabou de subir. Aconteceu duas vezes
+  seguidas. O conserto é fazer a revisão desta seção **antes** do passo 4, para as
+  lições da execução entrarem no mesmo commit. Na terceira execução o conserto foi
+  aplicado à mão e funcionou: a pendência fechou. O preço é que as lições precisam ser
+  decididas antes de o passo 5 rodar, então uma falha na republicação ainda cai fora do
+  commit — e essa, sim, vira `PENDÊNCIAS MANUAIS`. O Workflow segue sem a reordenação,
+  que é mudança de comportamento e cabe ao usuário.
+- **Dois commits são melhores que um quando as mudanças não têm relação.** Na segunda
+  execução havia a dica 33 e a seção de lições pendente. Um commit só, com o formato
+  `dicas: adiciona dica NN`, descreveria mal metade do conteúdo. Separar em
+  `dicas: ...` e `skills: ...` custou nada e manteve o histórico honesto. O formato do
+  passo 4 governa o commit da dica, não a execução inteira.
 - **O usuário pode aprovar reinvocando o comando.** O passo 3 pede um "pode publicar"
   explícito. Na estreia o usuário digitou `/publicar-dicas` de novo em vez da frase.
   Tratado como aprovação, e dito em voz alta antes de commitar. Reinvocar o comando de
