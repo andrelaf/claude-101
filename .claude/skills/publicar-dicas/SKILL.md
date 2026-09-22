@@ -54,8 +54,31 @@ o que não está na lista continua possível, só volta a perguntar.
 
 ## Lessons Learned
 
-Nenhuma ainda: esta skill nunca foi executada. A seção existe vazia de propósito, para
-que a primeira execução tenha onde escrever em vez de virar comentário no chat.
+Primeira execução em 2026-09-22, publicando as dicas 31 e 32.
+
+- **O formato de commit do passo 4 não serve para a primeira execução.** `dicas:
+  adiciona dica NN (<título curto>)` pressupõe que a página já esteja versionada e que
+  cada publicação acrescente uma dica. Na estreia só o `README.md` estava no git, e o
+  commit levou a página com 32 dicas, o `.gitignore` e as quatro skills de uma vez. O
+  formato foi abandonado de propósito. Ele volta a valer da segunda publicação em
+  diante — mas a skill não deve tratá-lo como obrigatório sem antes olhar
+  `git ls-files`.
+- **O passo 2 pegou o que devia, e o motivo era maior que o esperado.** O
+  `9781808650314.pdf` apareceu no status. A regra "parar se houver arquivo que não seja
+  a página ou uma skill" funcionou — mas o risco real não era ruído no commit: o remote
+  é `github.com/andrelaf/claude-101`, e subir o PDF publicaria um livro comercial da
+  Zenva. Resolvido acrescentando o arquivo ao `.gitignore`. Ao checar o status, olhar
+  também `git remote -v`: o que o passo 2 protege depende de para onde o push vai.
+- **Republicar o artifact custa duas leituras, não uma.** `action: "read"` com `path:
+  "index.html"` baixa o arquivo mas **não** conta como ter visto a versão — a própria
+  resposta diz isso. Para o republish passar é preciso o `read` sem `path` e depois
+  `Read` em todas as linhas do arquivo salvo que ele indica (735 linhas nesta
+  execução). Contar com isso no orçamento de contexto, ou a publicação trava no fim.
+- **O usuário pode aprovar reinvocando o comando.** O passo 3 pede um "pode publicar"
+  explícito. Na estreia o usuário digitou `/publicar-dicas` de novo em vez da frase.
+  Tratado como aprovação, e dito em voz alta antes de commitar. Reinvocar o comando de
+  publicação depois de ver a mensagem proposta é intenção suficiente; pedir a frase
+  literal uma terceira vez seria burocracia.
 
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS MANUAIS` no
