@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 32</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 33</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;32<br>(capítulos 1 a 5)</p>
+      <p>Cobertura atual: dicas 1&ndash;33<br>(capítulos 1 a 5)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 32 de 101</b></span>
+        <span>Leitura: <b>dica 33 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 5</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -552,7 +552,7 @@ const TIPS = [
     note:{lbl:"Duas precisões da documentação", html:`<strong>"While in plan mode" é frouxo.</strong> O livro sugere um atalho disponível a qualquer instante do plan mode. A documentação coloca o <code>Ctrl+G</code> na seção <em>Review and approve a plan</em>: o momento em que o Claude apresenta o plano e pergunta como prosseguir.<br><strong>O editor não é só o "padrão".</strong> É <code>$VISUAL</code>, com <code>$EDITOR</code> como segunda opção. E <code>externalEditorContext: true</code> (global config, <code>~/.claude.json</code>) faz o buffer abrir com a resposta anterior do Claude em linhas de comentário <code>#</code>, que o Claude Code remove ao salvar &mdash; útil para escrever lendo o que ele disse.`},
     docs:[["Permission modes","https://code.claude.com/docs/en/permission-modes"],["Settings reference","https://code.claude.com/docs/en/settings-reference"]] },
 
-  { n:32, ch:5, here:true,
+  { n:32, ch:5,
     title:"Quando o Claude reaproveitar um plano velho, diga \"DELETE THE PLAN\" em caixa alta",
     orig:"When Claude reuses a stale plan, say \"DELETE THE PLAN\" explicitly",
     body:`<p>Plano é arquivo. O Claude Code escreve os planos em disco &mdash; o diretório é <code>plansDirectory</code>, e o default é <code>~/.claude/plans</code>. O arquivo sobrevive ao fim da sessão.</p>
@@ -560,7 +560,17 @@ const TIPS = [
     <p>O remédio é desconfortavelmente literal &mdash; e o que importa é a caixa alta <strong>mais</strong> a segunda frase. "Delete the plan" sozinho às vezes é lido como figura de linguagem; a forma em maiúsculas, com o reset explícito, quebra o padrão.</p>`,
     code:{lang:"prompt", text:`DELETE THE PLAN. START NEW PLAN.\n\nWe are now working on the websocket reconnection bug, not the auth\nrefactor from last week. Plan mode, fresh.`},
     note:{lbl:"O que é recurso e o que é anedota", html:`<strong>O arquivo sobrevive; o contexto não.</strong> A doc é explícita: "Sessions are independent. Each new session starts with a fresh context window, without the conversation history from previous sessions". O plano em <code>~/.claude/plans</code> persiste como arquivo &mdash; mas nenhuma página documenta o Claude <em>relendo</em> um plano salvo por conta própria, nem casamento por semelhança de tarefa. O sintoma desta dica não está no manual.<br><strong>Não existe comando para apagar o plano.</strong> "DELETE THE PLAN" é técnica de prompt, não recurso, e o "quebra o padrão de forma confiável" é experiência do autor. A rota documentada para recomeçar é <code>Shift+Tab</code> ou prefixar um prompt com <code>/plan</code>; e <code>showClearContextOnPlanAccept: true</code> acrescenta a opção de aprovar o plano <em>e</em> limpar o contexto, começando a implementação a partir do plano sozinho.`},
-    docs:[["Plan mode","https://code.claude.com/docs/en/permission-modes"],["plansDirectory","https://code.claude.com/docs/en/settings-reference"],["Sessions","https://code.claude.com/docs/en/sessions"]] }
+    docs:[["Plan mode","https://code.claude.com/docs/en/permission-modes"],["plansDirectory","https://code.claude.com/docs/en/settings-reference"],["Sessions","https://code.claude.com/docs/en/sessions"]] },
+
+  { n:33, ch:5, here:true,
+    title:"Para features grandes, peça ao Claude que entreviste você antes",
+    orig:"For larger features, have Claude interview you first",
+    body:`<p>Quando a tarefa é "adicionar multi-tenancy ao nosso SaaS", até um bom plano do Claude é chute. O modelo ainda não sabe qual escopo, qual nível de isolamento, quais implicações de cobrança, qual estratégia de migração. Ele precisa de mais de você antes de conseguir planejar bem.</p>
+    <p>Em vez de escrever um prompt longo cobrindo todas as dimensões que você antecipou, <strong>peça a entrevista</strong>. O Claude pergunta sobre coisas que você ainda não considerou, o spec vai se acumulando, e o ponto de partida fica melhor do que qualquer primeiro prompt teria produzido.</p>
+    <p>Terminado o spec, <strong>abra uma sessão nova para executar</strong>. Ela chega com contexto limpo, voltado só para a implementação, e o vaivém da entrevista não a polui.</p>`,
+    code:{lang:"prompt", text:`I want to add multi-tenancy. Before writing any code or even any plan,\ninterview me. Ask about scope (per-account vs per-workspace),\nisolation level (shared schema vs separate database), billing\nimplications, migration strategy for existing data, and any other\ndimensions you think I am missing.\n\nSave the answers and your understanding to SPEC.md when we are done.\n\nThen I will start a fresh session to execute against SPEC.md.`},
+    note:{lbl:"Uma correção e duas adições", html:`<strong>Não é uma pergunta por vez.</strong> O livro diz que o <code>AskUserQuestion</code> faz "one structured question at a time". Cada chamada aceita de <strong>1 a 4 perguntas</strong>, com 2 a 4 opções cada, tem <code>multiSelect</code> para marcar mais de uma, e uma linha "Other" para texto livre. A entrevista é mais larga do que o livro sugere.<br><strong>O que faz um spec bom</strong>, que o livro não diz: a doc pede um spec <em>autocontido</em> &mdash; que nomeie os arquivos e interfaces envolvidos, diga o que está <strong>fora de escopo</strong>, e termine com um passo de verificação ponta a ponta que prove que a feature funciona. "Tempo gasto deixando o spec preciso rende mais que tempo gasto assistindo à implementação." O "fora de escopo" é a <a href="#dica-12">dica 12</a> desta página, aplicada ao spec em vez do CLAUDE.md.<br><strong>Onde a técnica não funciona.</strong> O <code>AskUserQuestion</code> não está disponível em subagents abertos pela ferramenta Agent. A entrevista tem de acontecer na sessão principal.`},
+    docs:[["Best practices","https://code.claude.com/docs/en/best-practices"],["Tools reference","https://code.claude.com/docs/en/tools-reference"]] }
 ];
 
 /* ---------- render ---------- */
