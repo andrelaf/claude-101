@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 34</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 35</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;34<br>(capítulos 1 a 5)</p>
+      <p>Cobertura atual: dicas 1&ndash;35<br>(capítulos 1 a 5)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 34 de 101</b></span>
+        <span>Leitura: <b>dica 35 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 5</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -572,14 +572,25 @@ const TIPS = [
     note:{lbl:"Uma correção e duas adições", html:`<strong>Não é uma pergunta por vez.</strong> O livro diz que o <code>AskUserQuestion</code> faz "one structured question at a time". Cada chamada aceita de <strong>1 a 4 perguntas</strong>, com 2 a 4 opções cada, tem <code>multiSelect</code> para marcar mais de uma, e uma linha "Other" para texto livre. A entrevista é mais larga do que o livro sugere.<br><strong>O que faz um spec bom</strong>, que o livro não diz: a doc pede um spec <em>autocontido</em> &mdash; que nomeie os arquivos e interfaces envolvidos, diga o que está <strong>fora de escopo</strong>, e termine com um passo de verificação ponta a ponta que prove que a feature funciona. "Tempo gasto deixando o spec preciso rende mais que tempo gasto assistindo à implementação." O "fora de escopo" é a <a href="#dica-12">dica 12</a> desta página, aplicada ao spec em vez do CLAUDE.md.<br><strong>Onde a técnica não funciona.</strong> O <code>AskUserQuestion</code> não está disponível em subagents abertos pela ferramenta Agent. A entrevista tem de acontecer na sessão principal.`},
     docs:[["Best practices","https://code.claude.com/docs/en/best-practices"],["Tools reference","https://code.claude.com/docs/en/tools-reference"]] },
 
-  { n:34, ch:5, here:true,
+  { n:34, ch:5,
     title:"Peça a lista de premissas antes do código, e a de decisões depois",
     orig:"Tell Claude to list assumptions before writing any code",
     body:`<p>É a checagem de sanidade de menor atrito que existe. Dois prompts, nesta ordem &mdash; um antes, um depois.</p>
     <p>O primeiro força as <strong>premissas silenciosas</strong> a aparecerem, onde ainda dá para corrigi-las. O segundo força as <strong>escolhas de projeto que derivaram durante a implementação</strong> a aparecerem, onde dá para revisá-las. Juntos, pegam a maior parte da distância entre "o que foi pedido" e "o que o Claude construiu".</p>
     <p><strong>O segundo é o que se paga mais vezes.</strong> Toda implementação faz escolhas caladas: qual biblioteca, qual estilo de tratamento de erro, onde colocar o arquivo novo, como nomear a API pública. Listar isso é um prompt de cinco segundos, e revela justamente as que você quer sobrescrever.</p>`,
     code:{lang:"prompt", text:`Before writing any code, list every assumption you are about to make.\n\n[depois da implementação]\nNow list the decisions you made that I did not specify upfront.`},
-    note:{lbl:"Onde ela se encaixa", html:`As três dicas do capítulo se dividem no tempo. A <strong>entrevista</strong> da <a href="#dica-33">dica 33</a> resolve antes: puxa para fora o que você sabe mas não disse. Esta aqui resolve <strong>durante e depois</strong>: o primeiro prompt pega o que o Claude assumiu sem dizer, o segundo pega o que ele decidiu sem perguntar. E a doc fecha o triângulo ao pedir que um spec bom termine com um passo de verificação ponta a ponta &mdash; <em>o que foi pedido</em>, <em>o que foi assumido</em>, <em>o que foi provado</em>.`} }
+    note:{lbl:"Onde ela se encaixa", html:`As três dicas do capítulo se dividem no tempo. A <strong>entrevista</strong> da <a href="#dica-33">dica 33</a> resolve antes: puxa para fora o que você sabe mas não disse. Esta aqui resolve <strong>durante e depois</strong>: o primeiro prompt pega o que o Claude assumiu sem dizer, o segundo pega o que ele decidiu sem perguntar. E a doc fecha o triângulo ao pedir que um spec bom termine com um passo de verificação ponta a ponta &mdash; <em>o que foi pedido</em>, <em>o que foi assumido</em>, <em>o que foi provado</em>.`} },
+
+  { n:35, ch:5, here:true,
+    title:"Restrições melhores valem mais que palavras melhores",
+    orig:"Better constraints beat better wording",
+    body:`<p>Um prompt curto e com restrições rende mais que um longo e caprichado sem escopo. O segundo exemplo abaixo é pouco maior que o primeiro, mas <strong>cada oração trabalha</strong>: diz o que usar ("o modelo de usuário existente"), onde o estado mora ("Redis") e o que fica como está ("sem abstrações novas, sem mexer nas rotas"). O modelo não tem nada a inventar, e por isso sobra muito menos para revisar depois.</p>
+    <p>Vale fechar esse tipo de prompt com uma última cláusula: <strong>se não der para fazer sem violar as restrições, pare e explique por quê</strong>. Essa frase transforma um prompt de tiro único num ponto de checagem. Se uma restrição for impossível, você fica sabendo antes de qualquer código entrar. Se tudo couber, a mudança fica limitada exatamente pelos trilhos que você pôs.</p>
+    <p>A mentalidade é escrever prompts como <strong>guarda-corpos, não como ordens</strong>: o que precisa mudar, o que não pode mudar, quais trade-offs importam e quais não. Com os guarda-corpos no lugar, o Claude anda rápido sem entrar em decisões de arquitetura que você nunca quis reabrir.</p>`,
+    code:[
+      {lang:"prompt", text:`Add authentication to this app.\n\n[contra]\nAdd email and password authentication using the existing user model,\nstore sessions in Redis, do not introduce new abstractions, and do not\nchange existing routes.`},
+      {lang:"prompt", text:`If this cannot be done without violating these constraints, stop and explain why.`}
+    ] }
 ];
 
 /* ---------- render ---------- */
