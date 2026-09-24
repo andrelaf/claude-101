@@ -39,6 +39,11 @@ de fato aconteceu, nunca preventivamente.
 - **Exemplo inventado passa pelo portão, não por baixo dele.** Na dica 26 o bloco de
   código usou nomes de skill que não estão no livro. O caminho certo foi declarar isso
   no portão B e registrar a ressalva no `aprovacao.md`, não decidir sozinho.
+- **"Leitura: dica N de 101" não existe literal no HTML.** Na dica 35, um
+  `grep 'Leitura: dica'` voltou vazio, porque a linha real é
+  `Leitura: <b>dica 34 de 101</b>`. O mesmo vale para "Capítulos cobertos: <b>…</b>".
+  Para achar os contadores, procurar só o rótulo (`Leitura:`, `Capítulos cobertos`)
+  e não o texto que a skill cita.
 
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS` no relatório
