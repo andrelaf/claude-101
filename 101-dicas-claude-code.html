@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 35</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 36</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;35<br>(capítulos 1 a 5)</p>
+      <p>Cobertura atual: dicas 1&ndash;36<br>(capítulos 1 a 6)</p>
     </div>
   </aside>
 
@@ -251,8 +251,8 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 35 de 101</b></span>
-        <span>Capítulos cobertos: <b>1 a 5</b></span>
+        <span>Leitura: <b>dica 36 de 101</b></span>
+        <span>Capítulos cobertos: <b>1 a 6</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
     </header>
@@ -277,7 +277,9 @@ const CHAPTERS = [
   { n: 4, title: "Desenhando skills como pipelines de múltiplas fases",
     note: "As skills que dão conta de trabalho de produção nunca são de prompt único. São pipelines: fases numeradas, portões explícitos de aprovação humana, passos idempotentes e retomada que sobrevive a uma falha no meio do caminho." },
   { n: 5, title: "Plan mode e trabalho guiado por especificação",
-    note: "Plan mode é o maior ganho de qualidade fácil do Claude Code. A Anthropic relata taxas de sucesso duas a três vezes maiores em tarefas difíceis quando se gasta alguns minutos moldando um plano antes de executar." }
+    note: "Plan mode é o maior ganho de qualidade fácil do Claude Code. A Anthropic relata taxas de sucesso duas a três vezes maiores em tarefas difíceis quando se gasta alguns minutos moldando um plano antes de executar." },
+  { n: 6, title: "Verificação, a maior alavanca",
+    note: "Dar ao Claude um jeito de conferir o próprio trabalho é o maior multiplicador de qualidade que a Anthropic mede: duas a três vezes melhor em tarefas difíceis, e isso soma com o plan mode. Verificação é tudo o que o Claude consegue rodar e ler. Um texto em que você precisa confiar não conta." }
 ];
 
 const TIPS = [
@@ -581,7 +583,7 @@ const TIPS = [
     code:{lang:"prompt", text:`Before writing any code, list every assumption you are about to make.\n\n[depois da implementação]\nNow list the decisions you made that I did not specify upfront.`},
     note:{lbl:"Onde ela se encaixa", html:`As três dicas do capítulo se dividem no tempo. A <strong>entrevista</strong> da <a href="#dica-33">dica 33</a> resolve antes: puxa para fora o que você sabe mas não disse. Esta aqui resolve <strong>durante e depois</strong>: o primeiro prompt pega o que o Claude assumiu sem dizer, o segundo pega o que ele decidiu sem perguntar. E a doc fecha o triângulo ao pedir que um spec bom termine com um passo de verificação ponta a ponta &mdash; <em>o que foi pedido</em>, <em>o que foi assumido</em>, <em>o que foi provado</em>.`} },
 
-  { n:35, ch:5, here:true,
+  { n:35, ch:5,
     title:"Restrições melhores valem mais que palavras melhores",
     orig:"Better constraints beat better wording",
     body:`<p>Um prompt curto e com restrições rende mais que um longo e caprichado sem escopo. O segundo exemplo abaixo é pouco maior que o primeiro, mas <strong>cada oração trabalha</strong>: diz o que usar ("o modelo de usuário existente"), onde o estado mora ("Redis") e o que fica como está ("sem abstrações novas, sem mexer nas rotas"). O modelo não tem nada a inventar, e por isso sobra muito menos para revisar depois.</p>
@@ -590,7 +592,17 @@ const TIPS = [
     code:[
       {lang:"prompt", text:`Add authentication to this app.\n\n[contra]\nAdd email and password authentication using the existing user model,\nstore sessions in Redis, do not introduce new abstractions, and do not\nchange existing routes.`},
       {lang:"prompt", text:`If this cannot be done without violating these constraints, stop and explain why.`}
-    ] }
+    ] },
+
+  { n:36, ch:6, here:true,
+    title:"Sempre dê um jeito de verificar, ou reduza o escopo até conseguir",
+    orig:"Always provide a way to verify, or scope down until you can",
+    body:`<p>É a regra que engloba todo o capítulo: <strong>se não dá para dar ao Claude um jeito de verificar a mudança, ou você reduz o escopo da tarefa até dar, ou não delega</strong>.</p>
+    <p>A verificação muda com o tipo de mudança. Numa mudança de código, costuma ser um teste, e se ele não existe, peça ao Claude para escrever o teste <em>antes</em> da implementação. Numa mudança de UI, é um screenshot que o Claude compara com um alvo. Numa migração, uma contagem ou um checksum. Num refactor, "a suíte continua passando, com o mesmo número de verdes".</p>
+    <p>A linha <strong>"não declare sucesso"</strong> é necessária. Sem ela, o Claude muitas vezes entrega um resumo confiante mesmo quando o passo de verificação falhou.</p>`,
+    code:{lang:"no plano", text:`After implementing the rate limiter in \`src/limiter.ts\`:\n- Run \`bun test src/limiter.test.ts\` and confirm all tests pass.\n- Run \`bun run typecheck\` and confirm no new errors.\n\nIf verification fails, do not declare success. Iterate.`},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>Peça evidência, não só proíba a declaração.</strong> A doc pede que o Claude <em>mostre</em> a saída do teste, o comando que rodou e o que ele devolveu, ou o screenshot. Revisar evidência é mais rápido que refazer a verificação você mesmo.<br><strong>A checagem pode travar o fim do turno em quatro níveis:</strong> no próprio prompt; como condição de <code>/goal</code>, em que um avaliador separado re-checa a cada turno; como hook <code>Stop</code>, que bloqueia o fim do turno até passar (o Claude Code encerra o turno mesmo assim depois de 8 bloqueios seguidos); ou por uma segunda opinião, um subagent que tenta refutar o resultado.`},
+    docs:[["Best practices","https://code.claude.com/docs/en/best-practices"]] }
 ];
 
 /* ---------- render ---------- */
