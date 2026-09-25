@@ -76,6 +76,10 @@ Primeira execução em 2026-09-22, publicando as dicas 31 e 32.
   sessão em diante isso não se repete: a sessão já publicou o artifact, e o
   `publish` com `url` passa direto. Orçar o custo uma vez por sessão, não uma vez por
   execução da skill.
+  Na publicação da dica 35 o arquivo salvo tinha 773 linhas e passou do limite de
+  ~25 mil tokens de uma `Read` só, que falhou. Ler em faixas com `offset`/`limit`
+  (1–290, 291–540, 541–fim funcionou) e conferir que a última faixa chega à linha
+  que o `read` informou. O arquivo cresce a cada dica, então a divisão só piora.
 - **A manutenção sempre cai depois do commit, e suja o repositório de novo.** O passo 4
   commita, e só então esta seção é atualizada — então toda execução termina com o
   SKILL.md alterado e fora do commit que acabou de subir. Aconteceu duas vezes
