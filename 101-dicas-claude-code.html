@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 37</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 38</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;37<br>(capítulos 1 a 6)</p>
+      <p>Cobertura atual: dicas 1&ndash;38<br>(capítulos 1 a 6)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 37 de 101</b></span>
+        <span>Leitura: <b>dica 38 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 6</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -604,13 +604,23 @@ const TIPS = [
     note:{lbl:"O que a doc acrescenta", html:`<strong>Peça evidência, não só proíba a declaração.</strong> A doc pede que o Claude <em>mostre</em> a saída do teste, o comando que rodou e o que ele devolveu, ou o screenshot. Revisar evidência é mais rápido que refazer a verificação você mesmo.<br><strong>A checagem pode travar o fim do turno em quatro níveis:</strong> no próprio prompt; como condição de <code>/goal</code>, em que um avaliador separado re-checa a cada turno; como hook <code>Stop</code>, que bloqueia o fim do turno até passar (o Claude Code encerra o turno mesmo assim depois de 8 bloqueios seguidos); ou por uma segunda opinião, um subagent que tenta refutar o resultado.`},
     docs:[["Best practices","https://code.claude.com/docs/en/best-practices"]] },
 
-  { n:37, ch:6, here:true,
+  { n:37, ch:6,
     title:"Quando o código gerado falha na primeira execução, o erro é o próximo prompt",
     orig:"When AI-generated code fails on first run, treat the error as input",
     body:`<p>O jeito mais rápido de consertar uma primeira execução que falhou não é você mesmo consertar o código. É <strong>devolver o erro ao Claude como próximo prompt</strong>. O agente tem todo o contexto do que acabou de produzir, e a mensagem de erro é justamente o sinal que faltava.</p>
     <p>O exemplo do livro: um backend recém-criado não subia porque faltava uma dependência. A resposta menos útil é instalar a dependência na mão. A mais útil é o prompt abaixo. O Claude examinou a falha, atualizou o <code>package.json</code>, rodou <code>npm install</code> e subiu o servidor de novo. <strong>O bug, a correção e a verificação ficaram na mesma conversa</strong>, o que é bem mais rápido que alternar entre o terminal e o agente.</p>
     <p>A disciplina vale para outros casos. Se um teste falhou, cole a saída do teste. Se o build quebrou, cole o log do build. Se apareceu um erro em tempo de execução, cole o stack trace. <strong>Cole inteiro, não resuma.</strong> Stack traces, mensagens exatas e números de linha carregam o sinal que um resumo tira sem querer.</p>`,
-    code:{lang:"prompt", text:`When I tried to run the server, I got this error. It is probably\nmissing some packages, but it could be something else. Can you look\ninto it?\n\n[paste the full error]`} }
+    code:{lang:"prompt", text:`When I tried to run the server, I got this error. It is probably\nmissing some packages, but it could be something else. Can you look\ninto it?\n\n[paste the full error]`} },
+
+  { n:38, ch:6, here:true,
+    title:"Para saídas visuais, faça o Claude conferir a imagem com os próprios olhos",
+    orig:"For visual outputs, do a multimodal self-check",
+    body:`<p>Toda tarefa que produz um artefato visual, como um diagrama renderizado, uma thumbnail gerada ou um gráfico, termina com o Claude <strong>lendo a saída de volta como imagem</strong> e avaliando-a contra um padrão de qualidade escrito.</p>
+    <p>A linha <strong>"você tem capacidade multimodal, use-a"</strong> não é redundante. Sem ela, o Claude muitas vezes pula a leitura da imagem e se avalia pelo código-fonte, o que anula o laço inteiro. O lembrete explícito garante uma checagem visual de verdade toda vez.</p>
+    <p>A linha <strong>"limite de 3 tentativas"</strong> também carrega peso. Sem um teto, uma saída que não renderiza pode prender o agente num laço infinito de pequenos ajustes.</p>`,
+    code:{lang:"prompt", text:`After running the renderer, read the resulting PNG back as an image\n(you have multimodal capability, use it). Evaluate it against:\n\n- Legibility at standard zoom (no text under 14pt)\n- Sufficient contrast on every text-background pair\n- No overlapping nodes or labels\n- Aspect ratio (hard rule: never deliver a portrait-orientation\n  diagram)\n\nIf any check fails, adjust the source and re-render. Cap retries at 3.`},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>O Claude pode ver uma versão reduzida.</strong> A ferramenta Read devolve PNG e JPG como imagem que o Claude enxerga, mas antes redimensiona e recomprime imagens grandes para caber no limite do modelo. Se ainda passarem de 500KB, ela as recodifica como JPEG de qualidade menor. Para um critério fino como "nenhum texto abaixo de 14pt", isso conta: a doc recomenda pedir ao Claude que <strong>recorte antes a região de interesse</strong>, por exemplo com ImageMagick via Bash.`},
+    docs:[["Tools reference","https://code.claude.com/docs/en/tools-reference"]] }
 ];
 
 /* ---------- render ---------- */
