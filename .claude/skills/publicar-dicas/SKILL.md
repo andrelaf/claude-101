@@ -99,6 +99,12 @@ Primeira execução em 2026-09-22, publicando as dicas 31 e 32.
   Tratado como aprovação, e dito em voz alta antes de commitar. Reinvocar o comando de
   publicação depois de ver a mensagem proposta é intenção suficiente; pedir a frase
   literal uma terceira vez seria burocracia.
+- **O push não está no Workflow, e virou pendência.** Na dica 37 o relatório terminou
+  com `main` um commit à frente de `origin/main`, e o usuário teve de pedir o push numa
+  mensagem à parte. Na dica 38 a pergunta foi feita junto com a do passo 3 ("pode
+  publicar e subir"), e uma resposta só cobriu commit, republicação e push. O push
+  muda estado externo, então continua exigindo a palavra do usuário — mas a pergunta
+  cabe no passo 3, não num turno extra depois do relatório.
 
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS MANUAIS` no
