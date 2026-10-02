@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 40</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 41</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;40<br>(capítulos 1 a 6)</p>
+      <p>Cobertura atual: dicas 1&ndash;41<br>(capítulos 1 a 6)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 40 de 101</b></span>
+        <span>Leitura: <b>dica 41 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 6</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -632,12 +632,21 @@ const TIPS = [
     note:{lbl:"O que a doc acrescenta", html:`<strong>Dá para não copiar entre janelas.</strong> A doc aplica o mesmo princípio com um <strong>subagent</strong>: ele roda em contexto novo, vê só o diff e os critérios, e devolve as falhas direto para a sessão que implementou, que corrige e pede outra revisão. Para correção de código, a skill embutida <code>/code-review</code> faz isso pronta.<br><strong>Revisor sempre acha algo.</strong> Instruído a encontrar falhas, ele quase sempre reporta alguma, mesmo quando o trabalho está certo. Perseguir todas leva a over-engineering: abstrações a mais, código defensivo, testes para casos impossíveis. Peça só o que afeta a correção ou os requisitos, e trate o resto como opcional.`},
     docs:[["Best practices","https://code.claude.com/docs/en/best-practices"]] },
 
-  { n:40, ch:6, here:true,
+  { n:40, ch:6,
     title:"Um Claude escreve os testes, outro Claude escreve o código",
     orig:"Have one Claude write tests, then another Claude write the code",
     body:`<p>É o padrão escritor/revisor da <a href="#dica-39">dica 39</a>, invertido no tempo. <strong>A sessão A escreve o teste. A sessão B escreve a implementação que passa nele.</strong> O contexto novo da sessão B pega as premissas que uma sessão única teria contrabandeado para dentro do código.</p>
     <p>O livro usa isso mais em mudanças de lógica pura que são traiçoeiras: parsers, máquinas de estado, funções de conversão. A sessão que escreve o teste precisa ser específica sobre o comportamento esperado, o que <strong>força os requisitos a tomarem forma concreta</strong>. A sessão que implementa vê só o teste e o código em volta. Ela não tem onde se apoiar a não ser no teste, e essa é exatamente a disciplina desejada.</p>
-    <p>O padrão também transforma "o Claude entendeu os requisitos?" numa <strong>pergunta verificável</strong>. Se as duas sessões concordam sobre o que a função deve fazer, o código está certo por construção. Se discordam, a discordância aparece na hora.</p>` }
+    <p>O padrão também transforma "o Claude entendeu os requisitos?" numa <strong>pergunta verificável</strong>. Se as duas sessões concordam sobre o que a função deve fazer, o código está certo por construção. Se discordam, a discordância aparece na hora.</p>` },
+
+  { n:41, ch:6, here:true,
+    title:"Peça ao Claude que prove o que não mudou",
+    orig:"Validate unchanged behavior explicitly",
+    body:`<p>Para toda mudança que deveria ser local, peça ao Claude que <strong>prove que o comportamento em volta continuou igual</strong>. O prompt é curto e específico (abaixo).</p>
+    <p>O Claude responde com uma lista numerada de comportamentos e, para cada um, uma explicação curta de quais linhas da implementação o garantem. Às vezes a resposta é "isto se mantém porque a assinatura da função não mudou e o ramo novo está atrás de uma flag". Às vezes é "isto pode regredir se cairmos no caso de borda X". <strong>As duas respostas servem.</strong></p>
+    <p>Funciona porque o modelo muitas vezes sabe que a mudança é arriscada de um jeito específico, mas só revela isso se a pergunta for a certa. <strong>"Isso é seguro?" produz um sim. "Liste o que deve continuar igual e explique como" produz um inventário com que dá para agir.</strong></p>
+    <p>O livro usa isso sobretudo em mudanças de autenticação, pagamentos, parsing e em tudo onde uma regressão sai cara. O custo do prompt é um turno a mais. O custo de uma mudança não verificada nessas áreas é muito maior.</p>`,
+    code:{lang:"prompt", text:`List all the behaviors that should remain unchanged after this\nmodification. Explain how the current implementation preserves them.`} }
 ];
 
 /* ---------- render ---------- */
