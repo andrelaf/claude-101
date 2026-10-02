@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 42</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 43</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;42<br>(capítulos 1 a 6)</p>
+      <p>Cobertura atual: dicas 1&ndash;43<br>(capítulos 1 a 7)</p>
     </div>
   </aside>
 
@@ -251,8 +251,8 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 42 de 101</b></span>
-        <span>Capítulos cobertos: <b>1 a 6</b></span>
+        <span>Leitura: <b>dica 43 de 101</b></span>
+        <span>Capítulos cobertos: <b>1 a 7</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
     </header>
@@ -279,7 +279,9 @@ const CHAPTERS = [
   { n: 5, title: "Plan mode e trabalho guiado por especificação",
     note: "Plan mode é o maior ganho de qualidade fácil do Claude Code. A Anthropic relata taxas de sucesso duas a três vezes maiores em tarefas difíceis quando se gasta alguns minutos moldando um plano antes de executar." },
   { n: 6, title: "Verificação, a maior alavanca",
-    note: "Dar ao Claude um jeito de conferir o próprio trabalho é o maior multiplicador de qualidade que a Anthropic mede: duas a três vezes melhor em tarefas difíceis, e isso soma com o plan mode. Verificação é tudo o que o Claude consegue rodar e ler. Um texto em que você precisa confiar não conta." }
+    note: "Dar ao Claude um jeito de conferir o próprio trabalho é o maior multiplicador de qualidade que a Anthropic mede: duas a três vezes melhor em tarefas difíceis, e isso soma com o plan mode. Verificação é tudo o que o Claude consegue rodar e ler. Um texto em que você precisa confiar não conta." },
+  { n: 7, title: "Hooks, a rede de segurança determinística",
+    note: "O CLAUDE.md é um canal de instruções probabilístico; hooks não são. O que está num hook roda toda vez, com a mesma semântica de código de saída, não importa como o modelo interprete a conversa. Hooks garantem a execução, prompts não. Quando algo precisa acontecer sempre, é hook. Quando exige julgamento, é prompt." }
 ];
 
 const TIPS = [
@@ -648,14 +650,28 @@ const TIPS = [
     <p>O livro usa isso sobretudo em mudanças de autenticação, pagamentos, parsing e em tudo onde uma regressão sai cara. O custo do prompt é um turno a mais. O custo de uma mudança não verificada nessas áreas é muito maior.</p>`,
     code:{lang:"prompt", text:`List all the behaviors that should remain unchanged after this\nmodification. Explain how the current implementation preserves them.`} },
 
-  { n:42, ch:6, here:true,
+  { n:42, ch:6,
     title:"Aponte para um padrão que já existe, em vez de descrevê-lo",
     orig:"Reference existing patterns instead of describing them",
     body:`<p>Quando o Claude precisa seguir uma convenção que já existe, o pior a fazer é descrevê-la em prosa. O melhor é <strong>apontar para um arquivo de exemplo</strong>.</p>
     <p>Uma referência <code>@arquivo</code> põe o arquivo direto no contexto, junto com os <code>CLAUDE.md</code> do diretório dele e dos diretórios acima. Isso dura muito mais que uma descrição escrita, porque <strong>o arquivo é a convenção</strong>. Quando a convenção evolui, o arquivo evolui junto. A descrição no seu prompt apodrece; o arquivo, não.</p>
     <p>A mesma ideia vale para padrões de teste ("escreva os testes no estilo de <code>src/api/users.test.ts</code>"), mensagens de commit ("olhe os últimos 10 commits e siga o estilo deles") e descrições de pull request.</p>`,
     code:{lang:"prompt", text:`Look at how widgets are implemented on the home page. \`HotDogWidget.js\`\nis a representative example. Build a new widget for \`OrderHistory\`\nfollowing the same conventions: same lifecycle methods, same\ndependency injection pattern, same testing layout.`},
-    docs:[["Best practices","https://code.claude.com/docs/en/best-practices"]] }
+    docs:[["Best practices","https://code.claude.com/docs/en/best-practices"]] },
+
+  { n:43, ch:7, here:true,
+    title:"Use hooks para o que é obrigatório, não prompts",
+    orig:"Use hooks for compliance, not prompts",
+    body:`<p>Sempre que um comportamento tem de acontecer toda vez, sem exceção, <strong>o hook é a ferramenta certa</strong>. Exemplos do livro:</p>
+    <ul>
+      <li><strong>Sempre rodar o prettier ao salvar.</strong> Hook <code>PostToolUse</code> com matcher <code>Edit|Write</code>.</li>
+      <li><strong>Nunca editar <code>.env</code> nem nada que case com um padrão de credencial.</strong> Hook <code>PreToolUse</code>, com matcher para Bash e Edit, que sai com código 2 quando a regex casa.</li>
+      <li><strong>Sempre rodar os testes antes de declarar pronto.</strong> Hook <code>Stop</code> que bloqueia se <code>bun test</code> sair com código diferente de zero.</li>
+      <li><strong>Reinjetar as regras do projeto depois de toda compactação.</strong> Hook <code>SessionStart</code> com matcher <code>compact</code>.</li>
+    </ul>
+    <p>A disciplina: <strong>se der vontade de escrever "sempre faça X" ou "nunca faça X" no CLAUDE.md, pergunte se um hook consegue garantir isso.</strong> Se consegue, o hook vence. O CLAUDE.md fica com o que hooks não capturam: decisões de julgamento, contexto de arquitetura, história do projeto.</p>`,
+    note:{lbl:"Só o exit 2 bloqueia", html:`O código de saída é o ponto mais fácil de errar. <strong>Exit 2 bloqueia</strong> a ação, e o stderr vira feedback para o Claude. <strong>Exit 0 não aprova</strong>: o fluxo normal de permissão continua valendo. <strong>Qualquer outro código</strong>, como o <code>exit 1</code> de um script que falhou, conta como erro não bloqueante, e <strong>a ação acontece mesmo assim</strong>. Um hook de proteção do <code>.env</code> que sai com 1 não protege nada. A alternativa ao exit 2 é devolver JSON com <code>permissionDecision: "deny"</code>.`},
+    docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"]] }
 ];
 
 /* ---------- render ---------- */
