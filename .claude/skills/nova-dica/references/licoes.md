@@ -45,6 +45,12 @@ de fato aconteceu, nunca preventivamente.
   Para achar os contadores, procurar só o rótulo (`Leitura:`, `Capítulos cobertos`)
   e não o texto que a skill cita.
 
+- **Esboço também é intermediário.** Na dica 44, o pedido de um visual levou a um
+  `rascunho-visual.html` no `<job>/`, apagado com `rm` logo depois da fase 3 porque
+  "o `objeto.js` já tinha a versão final". A regra de nunca apagar intermediários não
+  tem exceção para arquivos que parecem descartáveis. Se um esboço não deve ficar,
+  ele não deve ser criado: rascunho que só serve ao portão B vai no chat.
+
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS` no relatório
 final é candidata a virar entrada aqui. Sem essa revisão, a seção congela na versão um
