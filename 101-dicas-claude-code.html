@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 44</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 45</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;44<br>(capítulos 1 a 7)</p>
+      <p>Cobertura atual: dicas 1&ndash;45<br>(capítulos 1 a 7)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 44 de 101</b></span>
+        <span>Leitura: <b>dica 45 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 7</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -673,14 +673,14 @@ const TIPS = [
     note:{lbl:"Só o exit 2 bloqueia", html:`O código de saída é o ponto mais fácil de errar. <strong>Exit 2 bloqueia</strong> a ação, e o stderr vira feedback para o Claude. <strong>Exit 0 não aprova</strong>: o fluxo normal de permissão continua valendo. <strong>Qualquer outro código</strong>, como o <code>exit 1</code> de um script que falhou, conta como erro não bloqueante, e <strong>a ação acontece mesmo assim</strong>. Um hook de proteção do <code>.env</code> que sai com 1 não protege nada. A alternativa ao exit 2 é devolver JSON com <code>permissionDecision: "deny"</code>.`},
     docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"]] },
 
-  { n:44, ch:7, here:true,
+  { n:44, ch:7,
     title:"Conheça os eventos de hook, e quais deles podem bloquear",
     orig:"Learn the 13 hook events and which ones can block",
     body:`<p>O Claude Code expõe hoje <strong>33 eventos de hook</strong> (o livro fala em 13). Cada um é o lugar certo para um controle diferente, e o que decide qual usar é <strong>em que momento ele dispara</strong> e <strong>se dá para bloquear ali</strong>.</p>
     <div style="border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:4px 0 14px;background:var(--sunk)">
       <p style="margin:0 0 12px;font-size:12px;color:var(--ink-2)"><code style="background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:600">pode bloquear</code> &nbsp; <code style="color:var(--ink-3)">só observa</code></p>
       <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
-        <li style="margin:0"><b style="display:block;font-size:12.5px;color:var(--ink);margin-bottom:5px">1 · A sessão começa</b><code style="color:var(--ink-3)">SessionStart</code> <code style="color:var(--ink-3)">Setup</code><span style="display:block;font-size:12.5px;color:var(--ink-2);margin-top:4px">Bom para carregar contexto. Não dá para impedir a sessão.</span></li>
+        <li style="margin:0"><b style="display:block;font-size:12.5px;color:var(--ink);margin-bottom:5px">1 · A sessão começa</b><code style="color:var(--ink-3)">SessionStart</code><span style="display:block;font-size:12.5px;color:var(--ink-2);margin-top:4px">Bom para carregar contexto. Não dá para impedir a sessão. O <code>Setup</code> não entra aqui: só dispara com <code>--init-only</code>, ou com <code>--init</code> ou <code>--maintenance</code> em modo <code>-p</code>.</span></li>
         <li style="margin:0"><b style="display:block;font-size:12.5px;color:var(--ink);margin-bottom:5px">2 · Você envia o prompt</b><code style="background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:600">UserPromptSubmit</code> <code style="background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:600">UserPromptExpansion</code><span style="display:block;font-size:12.5px;color:var(--ink-2);margin-top:4px">Bloqueado aqui, o prompt nem chega ao Claude.</span></li>
         <li style="margin:0"><b style="display:block;font-size:12.5px;color:var(--ink);margin-bottom:5px">3 · Antes de cada ferramenta</b><code style="background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:600">PreToolUse</code> <code style="color:var(--ink-3)">PermissionRequest*</code><span style="display:block;font-size:12.5px;color:var(--ink-2);margin-top:4px">A última chance de impedir a ação. * O exit 2 não vale aqui: negue pelo JSON <code>decision</code>.</span></li>
         <li style="margin:0;border-top:1px dashed var(--accent);padding-top:7px;font-size:11.5px;font-weight:600;color:var(--accent-ink)">▼ a ferramenta roda: daqui em diante, o que foi feito está feito</li>
@@ -693,6 +693,19 @@ const TIPS = [
     </div>
     <p>O erro de iniciante mais comum é tentar barrar comportamento ruim no <code>PostToolUse</code>. <strong>Tarde demais: a ferramenta já rodou.</strong> Comportamento ruim se pega no <code>PreToolUse</code>. O <code>PostToolUse</code> serve para log, formatação e validação depois da ação, o que informa o próximo turno em vez de impedir o atual.</p>`,
     note:{lbl:"O que mudou desde o livro", html:`<strong>São 33 eventos, não 13.</strong> A tabela "exit code 2 por evento" da documentação lista 33. A linha do tempo acima mostra os que importam num turno comum.<br><strong><code>PermissionRequest</code> ignora o exit 2.</strong> O fluxo de permissão segue como se nada tivesse acontecido. Para negar, o hook devolve o objeto <code>decision</code> em JSON.<br><strong><code>PreCompact</code> e <code>SubagentStop</code> bloqueiam</strong>, coisa que o livro não diz: o primeiro impede a compactação, e o segundo impede o subagent de parar.<br><strong>Exit 2 vence o JSON.</strong> Num evento que pode bloquear, o exit 2 bloqueia mesmo que o hook imprima <code>permissionDecision: "allow"</code>.`},
+    docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Hooks reference","https://code.claude.com/docs/en/hooks"],["Mapa dos 33 eventos","https://claude.ai/artifact/LPJ6BDrPxXKZmAd2M5iNms"]] },
+
+  { n:45, ch:7, here:true,
+    title:"Conheça o contrato dos códigos de saída",
+    orig:"Know the exit-code contract",
+    body:`<p>O código de saída de um hook segue um contrato de três estados:</p>
+    <ul>
+      <li><strong>Exit 0: sem objeção.</strong> A ação segue o caminho normal. Isso não é aprovação: num <code>PreToolUse</code>, o pedido de permissão continua aparecendo como apareceria sem o hook.</li>
+      <li><strong>Exit 2: bloqueia.</strong> O stderr vira a mensagem do bloqueio, e na maioria dos eventos que bloqueiam ele volta ao Claude como feedback para tentar de novo.</li>
+      <li><strong>Qualquer outro código: erro não bloqueante.</strong> A ação acontece, e o transcript mostra um aviso de erro do hook.</li>
+    </ul>
+    <p>A falha que mais faz perder tempo é <strong>misturar exit 2 com JSON</strong>. Com exit 2, o bloqueio vale de qualquer jeito, mesmo que o JSON diga <code>"allow"</code>, então um hook que tenta fazer as duas coisas acaba fazendo só a parte do exit 2. <strong>Escolha um canal por hook:</strong> exit 2 com uma mensagem no stderr, ou exit 0 com JSON estruturado.</p>`,
+    note:{lbl:"O que a doc corrige", html:`<strong>"Exit 0 aprova" é forte demais.</strong> A doc diz só que o hook não fez objeção. Para aprovar de verdade, o hook devolve JSON com <code>permissionDecision: "allow"</code>.<br><strong>Com exit 2, o JSON não é ignorado de todo.</strong> Ele não muda o resultado, porque o bloqueio vale de qualquer jeito, mas o Claude Code ainda lê o JSON. Se ele trouxer uma decisão de bloqueio, o motivo mostrado vem dele, e não do stderr.<br><strong>O terceiro estado depende do stdout.</strong> Com JSON válido, o código é ignorado e o JSON decide sozinho, sem aviso de erro. Só com texto puro ou saída vazia é que vira o "avisa e segue" do livro. A exceção é o <code>WorktreeCreate</code>, que falha com qualquer código diferente de zero.<br><strong>O stderr do exit 2 nem sempre chega ao Claude.</strong> Depende do evento: em alguns vai para você, em outros não aparece. O <a href="https://claude.ai/artifact/LPJ6BDrPxXKZmAd2M5iNms" target="_blank" rel="noopener">mapa dos hooks</a> mostra o que o exit 2 faz em cada evento.`},
     docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Hooks reference","https://code.claude.com/docs/en/hooks"]] }
 ];
 
