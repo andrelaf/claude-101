@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 45</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 46</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;45<br>(capítulos 1 a 7)</p>
+      <p>Cobertura atual: dicas 1&ndash;46<br>(capítulos 1 a 7)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 45 de 101</b></span>
+        <span>Leitura: <b>dica 46 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 7</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -695,7 +695,7 @@ const TIPS = [
     note:{lbl:"O que mudou desde o livro", html:`<strong>São 33 eventos, não 13.</strong> A tabela "exit code 2 por evento" da documentação lista 33. A linha do tempo acima mostra os que importam num turno comum.<br><strong><code>PermissionRequest</code> ignora o exit 2.</strong> O fluxo de permissão segue como se nada tivesse acontecido. Para negar, o hook devolve o objeto <code>decision</code> em JSON.<br><strong><code>PreCompact</code> e <code>SubagentStop</code> bloqueiam</strong>, coisa que o livro não diz: o primeiro impede a compactação, e o segundo impede o subagent de parar.<br><strong>Exit 2 vence o JSON.</strong> Num evento que pode bloquear, o exit 2 bloqueia mesmo que o hook imprima <code>permissionDecision: "allow"</code>.`},
     docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Hooks reference","https://code.claude.com/docs/en/hooks"],["Mapa dos 33 eventos","https://claude.ai/artifact/LPJ6BDrPxXKZmAd2M5iNms"]] },
 
-  { n:45, ch:7, here:true,
+  { n:45, ch:7,
     title:"Conheça o contrato dos códigos de saída",
     orig:"Know the exit-code contract",
     body:`<p>O código de saída de um hook segue um contrato de três estados:</p>
@@ -706,6 +706,15 @@ const TIPS = [
     </ul>
     <p>A falha que mais faz perder tempo é <strong>misturar exit 2 com JSON</strong>. Com exit 2, o bloqueio vale de qualquer jeito, mesmo que o JSON diga <code>"allow"</code>, então um hook que tenta fazer as duas coisas acaba fazendo só a parte do exit 2. <strong>Escolha um canal por hook:</strong> exit 2 com uma mensagem no stderr, ou exit 0 com JSON estruturado.</p>`,
     note:{lbl:"O que a doc corrige", html:`<strong>"Exit 0 aprova" é forte demais.</strong> A doc diz só que o hook não fez objeção. Para aprovar de verdade, o hook devolve JSON com <code>permissionDecision: "allow"</code>.<br><strong>Com exit 2, o JSON não é ignorado de todo.</strong> Ele não muda o resultado, porque o bloqueio vale de qualquer jeito, mas o Claude Code ainda lê o JSON. Se ele trouxer uma decisão de bloqueio, o motivo mostrado vem dele, e não do stderr.<br><strong>O terceiro estado depende do stdout.</strong> Com JSON válido, o código é ignorado e o JSON decide sozinho, sem aviso de erro. Só com texto puro ou saída vazia é que vira o "avisa e segue" do livro. A exceção é o <code>WorktreeCreate</code>, que falha com qualquer código diferente de zero.<br><strong>O stderr do exit 2 nem sempre chega ao Claude.</strong> Depende do evento: em alguns vai para você, em outros não aparece. O <a href="https://claude.ai/artifact/LPJ6BDrPxXKZmAd2M5iNms" target="_blank" rel="noopener">mapa dos hooks</a> mostra o que o exit 2 faz em cada evento.`},
+    docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Hooks reference","https://code.claude.com/docs/en/hooks"]] },
+  { n:46, ch:7, here:true,
+    title:"Formate automaticamente a cada edição com um hook PostToolUse",
+    orig:"Auto-format on every edit with a PostToolUse hook",
+    body:`<p>É o hook mais simples que existe, e o retorno dele não acaba nunca. Você registra um <code>PostToolUse</code> com matcher <code>Edit|Write</code> que chama o seu formatter em cada arquivo que o Claude edita.</p>
+    <p>O hook recebe um JSON no stdin. <code>jq -r '.tool_input.file_path'</code> tira dele o caminho do arquivo, e <code>xargs npx prettier --write</code> formata esse arquivo. Com isso, nenhum diff do Claude volta com problema de formatação para você revisar.</p>
+    <p>O mesmo padrão serve para ESLint, Biome, ruff, gofmt e qualquer linter que receba um caminho de arquivo. Também dá para encadear comandos: formatar, depois rodar o lint, depois dar <code>git add</code> no arquivo.</p>`,
+    code:{lang:"bash", text:`jq -r '.tool_input.file_path' | xargs npx prettier --write`},
+    note:{lbl:"O que a doc corrige", html:`<strong>"Cinco linhas" é otimista.</strong> O exemplo oficial no <code>.claude/settings.json</code> tem uns quinze, por causa do aninhamento <code>hooks → PostToolUse → matcher → hooks → command</code>.<br><strong>"Todo arquivo que o Claude toca" vale só para Edit e Write.</strong> Se um comando <code>Bash</code> ou um processo de fora reescrever o arquivo, esse hook não roda. Para esse caso, a doc indica o hook <code>FileChanged</code>.<br><strong>Quando funciona, não aparece nada na conversa.</strong> Para confirmar que rodou, abra o arquivo e veja se ele foi reformatado. O <code>jq</code> precisa estar instalado.`},
     docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Hooks reference","https://code.claude.com/docs/en/hooks"]] }
 ];
 
