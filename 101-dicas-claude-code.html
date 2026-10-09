@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 47</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 48</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;47<br>(capítulos 1 a 7)</p>
+      <p>Cobertura atual: dicas 1&ndash;48<br>(capítulos 1 a 7)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 47 de 101</b></span>
+        <span>Leitura: <b>dica 48 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 7</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -716,7 +716,7 @@ const TIPS = [
     code:{lang:"bash", text:`jq -r '.tool_input.file_path' | xargs npx prettier --write`},
     note:{lbl:"O que a doc corrige", html:`<strong>"Cinco linhas" é otimista.</strong> O exemplo oficial no <code>.claude/settings.json</code> tem uns quinze, por causa do aninhamento <code>hooks → PostToolUse → matcher → hooks → command</code>.<br><strong>"Todo arquivo que o Claude toca" vale só para Edit e Write.</strong> Se um comando <code>Bash</code> ou um processo de fora reescrever o arquivo, esse hook não roda. Para esse caso, a doc indica o hook <code>FileChanged</code>.<br><strong>Quando funciona, não aparece nada na conversa.</strong> Para confirmar que rodou, abra o arquivo e veja se ele foi reformatado. O <code>jq</code> precisa estar instalado.`},
     docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Hooks reference","https://code.claude.com/docs/en/hooks"]] },
-  { n:47, ch:7, here:true,
+  { n:47, ch:7,
     title:"Bloqueie padrões perigosos de Bash com PreToolUse e exit 2",
     orig:"Block dangerous Bash patterns with PreToolUse + exit 2",
     body:`<p>Alguns comandos nunca deveriam rodar, por mais razoáveis que pareçam no meio da conversa. Não dá para confiar que o modelo vai sempre lembrar de "nunca <code>rm -rf</code> fora da pasta do projeto" ou "nunca <code>git push --force</code> na main". Num hook, dá.</p>
@@ -730,7 +730,23 @@ const TIPS = [
     <p>O detalhe que torna isso política de verdade: <strong>o <code>PreToolUse</code> dispara antes da checagem de modo de permissão</strong>. Um hook com exit 2 bloqueia até em <code>bypassPermissions</code>. Por isso regra dura da organização, como "nunca apagar dados de produção", mora em hook, e não só em prompt.</p>`,
     code:{lang:"bash — regex corrigida", text:`#!/usr/bin/env bash\ncmd=$(jq -r '.tool_input.command' <&0)\nif echo "$cmd" | grep -Eiq \\\n  -e 'rm[[:space:]]+(-[a-z]*r[a-z]*f|-[a-z]*f[a-z]*r|(-r|--recursive)[[:space:]]+(-f|--force)|(-f|--force)[[:space:]]+(-r|--recursive))' \\\n  -e 'git[[:space:]]+push([[:space:]].*)?[[:space:]](--force|-f)([[:space:]]|$)' \\\n  -e 'git[[:space:]]+reset[[:space:]]+--hard' \\\n  -e 'DELETE[[:space:]]+FROM[[:space:]].*WHERE[[:space:]]+(1[[:space:]]*=[[:space:]]*1|true)'; then\n  echo "Blocked dangerous pattern: $cmd" >&2\n  exit 2\nfi\nexit 0`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>O exit 2 vence até uma regra <code>allow</code>.</strong> Ele interrompe a chamada antes de as regras de permissão serem avaliadas. A doc sugere justamente esta combinação: <code>"Bash"</code> na allow list, para não haver prompts, e um <code>PreToolUse</code> que rejeita só os comandos perigosos.<br><strong>O inverso não vale.</strong> Um hook que devolve <code>"allow"</code> não passa por cima de uma regra <code>deny</code> do settings. Hooks podem apertar as restrições, mas não afrouxá-las.<br><strong>A regex foi corrigida em relação ao livro.</strong> A original, <code>(rm -rf|git push --force|git reset --hard|DELETE FROM .* WHERE .* (1=1|true))</code>, deixa passar <code>rm -fr</code>, <code>rm -r -f</code>, <code>git push -f</code> e <code>git push origin main --force</code>. Ela também não pega <code>WHERE 1=1</code>, porque exige algo entre o <code>WHERE</code> e o <code>1=1</code>. A versão acima pega esses casos, ignora maiúsculas e minúsculas, e libera <code>--force-with-lease</code>. Mas ela continua bloqueando <code>rm -rf</code> dentro do projeto: separar dentro de fora exige resolver o caminho, e isso uma regex não faz.`},
-    docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Permissions","https://code.claude.com/docs/en/permissions"]] }
+    docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Permissions","https://code.claude.com/docs/en/permissions"]] },
+  { n:48, ch:7, here:true,
+    title:"Use um hook Stop para exigir testes passando antes de o Claude terminar",
+    orig:"Use a Stop hook to enforce tests pass before Claude finishes",
+    body:`<p>É o hook que transforma "sempre verifique" de uma instrução esperançosa numa garantia.</p>
+    <p>O hook <code>Stop</code> dispara quando o Claude está prestes a encerrar o turno. O script roda a suíte de testes e, se ela falhar, devolve <code>{"decision":"block","reason":"..."}</code>. O Claude não para: ele recebe o <code>reason</code> como o motivo para continuar e volta a trabalhar.</p>
+    <p>Duas coisas tornam o hook seguro de pôr no ar:</p>
+    <ul>
+      <li><strong>A checagem de <code>stop_hook_active</code>.</strong> Quando o hook já bloqueou uma vez e o Claude tenta parar de novo, esse campo chega como <code>true</code>. Sem a checagem, o hook bloqueia de novo, o Claude tenta parar outra vez, e assim por diante.</li>
+      <li><strong>O JSON com <code>decision: "block"</code></strong> é a forma canônica de recusar o Stop. Exit 2 também funciona, mas com JSON o motivo é estruturado e o Claude lida melhor com ele.</li>
+    </ul>`,
+    code:[
+      {lang:".claude/settings.json", text:`{\n  "hooks": {\n    "Stop": [\n      {\n        "hooks": [\n          { "type": "command", "command": ".claude/hooks/check-tests.sh" }\n        ]\n      }\n    ]\n  }\n}`},
+      {lang:".claude/hooks/check-tests.sh", text:`#!/usr/bin/env bash\ninput=$(cat)\nstop_hook_active=$(echo "$input" | jq -r '.stop_hook_active // false')\nif [ "$stop_hook_active" = "true" ]; then\n  exit 0\nfi\nif ! bun test --silent >/dev/null 2>&1; then\n  echo '{"decision":"block","reason":"Tests are failing. Fix them before declaring done."}'\n  exit 0\nfi\nexit 0`}
+    ],
+    note:{lbl:"O que a doc corrige", html:`<strong>O JSON do livro não funciona.</strong> O livro mostra <code>{"Stop":[{"command":...,"matchers":[]}]}</code>, mas falta o objeto <code>hooks</code> por fora e o nível <code>hooks</code> com <code>type: "command"</code> por dentro. Além disso, o campo se chama <code>matcher</code>, no singular, e o <code>Stop</code> nem usa matcher: o campo é ignorado em silêncio. O bloco acima segue o formato da doc.<br><strong>O loop não é infinito.</strong> O Claude Code passa por cima do Stop hook depois de <strong>8 bloqueios seguidos sem progresso</strong>, e termina o turno com um aviso. Esse limite muda com <code>CLAUDE_CODE_STOP_HOOK_BLOCK_CAP</code>. O <code>stop_hook_active</code> evita chegar a esse limite.<br><strong>O preço da checagem: o hook bloqueia uma vez só por turno.</strong> Na segunda tentativa de parar, ele libera, mesmo que os testes continuem falhando. É um "empurrão" garantido, não uma trava absoluta.`},
+    docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Hooks reference","https://code.claude.com/docs/en/hooks"]] }
 ];
 
 /* ---------- render ---------- */
