@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 49</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 50</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;49<br>(capítulos 1 a 7)</p>
+      <p>Cobertura atual: dicas 1&ndash;50<br>(capítulos 1 a 7)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 49 de 101</b></span>
+        <span>Leitura: <b>dica 50 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 7</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -747,7 +747,7 @@ const TIPS = [
     ],
     note:{lbl:"O que a doc corrige", html:`<strong>O JSON do livro não funciona.</strong> O livro mostra <code>{"Stop":[{"command":...,"matchers":[]}]}</code>, mas falta o objeto <code>hooks</code> por fora e o nível <code>hooks</code> com <code>type: "command"</code> por dentro. Além disso, o campo se chama <code>matcher</code>, no singular, e o <code>Stop</code> nem usa matcher: o campo é ignorado em silêncio. O bloco acima segue o formato da doc.<br><strong>O loop não é infinito.</strong> O Claude Code passa por cima do Stop hook depois de <strong>8 bloqueios seguidos sem progresso</strong>, e termina o turno com um aviso. Esse limite muda com <code>CLAUDE_CODE_STOP_HOOK_BLOCK_CAP</code>. O <code>stop_hook_active</code> evita chegar a esse limite.<br><strong>O preço da checagem: o hook bloqueia uma vez só por turno.</strong> Na segunda tentativa de parar, ele libera, mesmo que os testes continuem falhando. É um "empurrão" garantido, não uma trava absoluta.`},
     docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Hooks reference","https://code.claude.com/docs/en/hooks"]] },
-  { n:49, ch:7, here:true,
+  { n:49, ch:7,
     title:"Use um hook SessionStart para reinjetar as regras do projeto depois da compactação",
     orig:"SessionStart hook to re-inject project rules after compaction",
     body:`<p>Tudo o que um hook <code>SessionStart</code> imprime no stdout entra no contexto do Claude. Isso serve para duas coisas: receber o agente no início da sessão com as regras do projeto, e reinjetar essas regras depois de cada compactação.</p>
@@ -755,7 +755,16 @@ const TIPS = [
     <p>Um padrão relacionado é um hook <code>PreCompact</code> que salva o transcript inteiro em disco antes da compactação. Assim, se o resumo perder algo importante, o transcript bruto continua lá para você recuperar.</p>`,
     code:{lang:".claude/settings.json", text:`{\n  "hooks": {\n    "SessionStart": [\n      {\n        "matcher": "compact",\n        "hooks": [\n          {\n            "type": "command",\n            "command": "echo 'Reminder: use bun (not npm). Run \`bun test\` before committing. Auth code in src/auth/ must not be modified without team review.'"\n          }\n        ]\n      }\n    ]\n  }\n}`},
     note:{lbl:"O que a doc corrige", html:`<strong>O CLAUDE.md da raiz não se perde.</strong> Depois da compactação, o Claude Code reinjeta do disco o CLAUDE.md da raiz, as regras sem <code>paths:</code>, a auto memory e o plano. O que se perde são as regras com <code>paths:</code> e os CLAUDE.md de subpastas, que só voltam quando o Claude toca no arquivo de novo, o contexto que outros hooks injetaram antes, e as instruções dadas só na conversa. É para essas que o hook vale a pena. Repetir aqui o que já está no CLAUDE.md da raiz só gasta tokens.<br><strong>O JSON do livro tem o mesmo erro da dica 48.</strong> Falta o objeto <code>hooks</code> por fora e o nível <code>hooks</code> com <code>type: "command"</code> por dentro, e o campo é <code>matcher</code>, uma string, e não <code>matchers</code>, uma lista. As origens aceitas são <code>startup</code>, <code>resume</code>, <code>clear</code> e <code>compact</code>, e dá para combinar várias, como em <code>"startup|compact"</code>.<br><strong>O PreCompact recebe o caminho do transcript.</strong> Todo hook recebe <code>transcript_path</code> no JSON de entrada, então o backup é um <code>cp</code> desse arquivo. O <code>PreCompact</code> também recebe <code>trigger</code>, que diz se a compactação foi <code>manual</code> ou <code>auto</code>.`},
-    docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Context window","https://code.claude.com/docs/en/context-window"]] }
+    docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Context window","https://code.claude.com/docs/en/context-window"]] },
+  { n:50, ch:7, here:true,
+    title:"Proteja com um teste de modo interativo os echo dos perfis de shell",
+    orig:"Wrap echo statements in shell profiles",
+    body:`<p>É um modo de falha nada óbvio, que custa algumas horas para diagnosticar se você topa com ele sem aviso. Hooks rodam em shells <strong>não interativos</strong>. Um <code>echo</code> incondicional no perfil do shell, como o banner de boas-vindas que alguns terminais acrescentam por padrão, pode ir parar no stdout do hook e corromper o JSON que o Claude Code espera.</p>
+    <p>A correção é só imprimir alguma coisa no perfil quando o shell for interativo, como no bloco abaixo.</p>
+    <p>A checagem <code>$- == *i*</code> só dá verdadeiro em shell interativo. Os hooks, que rodam em modo não interativo, pulam o <code>echo</code>, e o stdout deles fica limpo. As sessões interativas continuam mostrando o banner.</p>`,
+    code:{lang:"~/.bashrc ou ~/.zshrc", text:`if [[ $- == *i* ]]; then\n  echo "Welcome back, $(whoami)"\nfi`},
+    note:{lbl:"O que o teste mostrou", html:`<strong>O estrago é silencioso.</strong> Quando o stdout de um hook deveria ser JSON e não é, o Claude Code registra um erro não bloqueante e segue em frente. Um <code>deny</code> ou um <code>block</code> que vinha atrás do banner simplesmente se perde, e a ação acontece.<br><strong>O culpado nem sempre é o <code>.bashrc</code>.</strong> No teste, um <code>bash -c</code> comum não leu o <code>.bashrc</code>, e o stdout saiu limpo. O banner só vazou em shell de login (<code>.bash_profile</code>, <code>.profile</code>), em shell interativo, ou com <code>BASH_ENV</code> apontando para um arquivo com <code>echo</code>. No zsh, que é o padrão do macOS, o arquivo lido em qualquer shell é o <code>~/.zshenv</code>. Se um hook devolve lixo no stdout, procure por <code>echo</code> nesses arquivos também, não só no <code>.bashrc</code> e no <code>.zshrc</code>.<br><strong>O fix funciona.</strong> Com a checagem no perfil, o <code>bash -c</code> saiu limpo e o <code>bash -i</code> continuou mostrando o banner.`},
+    docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"]] }
 ];
 
 /* ---------- render ---------- */
