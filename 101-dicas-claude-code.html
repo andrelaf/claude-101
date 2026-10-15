@@ -230,7 +230,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 52</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 53</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -241,7 +241,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;52<br>(capítulos 1 a 8)</p>
+      <p>Cobertura atual: dicas 1&ndash;53<br>(capítulos 1 a 8)</p>
     </div>
   </aside>
 
@@ -251,7 +251,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 52 de 101</b></span>
+        <span>Leitura: <b>dica 53 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 8</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -776,14 +776,22 @@ const TIPS = [
     code:{lang:".claude/hooks/*.sh", text:`#!/usr/bin/env bash\ncfg="$CLAUDE_PROJECT_DIR/.claude/hooks/format-config.json"`},
     note:{lbl:"O que a doc corrige", html:`<strong>As duas variáveis extras do livro não existem.</strong> O livro cita <code>$CLAUDE_TOOL_INPUT</code> para o JSON da chamada e <code>$CLAUDE_FILE_PATHS</code> para os arquivos afetados. Nenhuma das duas está na documentação atual. O JSON chega no stdin, e o caminho do arquivo está em <code>tool_input.file_path</code>, sempre absoluto e com o separador nativo, ou seja, barra invertida no Windows. O parágrafo acima segue a doc.<br><strong>No PowerShell, a sintaxe é outra.</strong> Num hook com <code>"shell": "powershell"</code>, use <code>$env:CLAUDE_PROJECT_DIR</code>. O <code>$CLAUDE_PROJECT_DIR</code> puro vira <code>$null</code> e o caminho quebra sem aviso.<br><strong>Não vale fora dos hooks.</strong> A variável é exportada para o processo dos hooks, mas não para os comandos que o Claude roda pela ferramenta Bash.`},
     docs:[["Hooks guide","https://code.claude.com/docs/en/hooks-guide"],["Hooks reference","https://code.claude.com/docs/en/hooks"]] },
-  { n:52, ch:8, here:true,
+  { n:52, ch:8,
     title:"Prefira a CLI ao MCP quando a CLI é boa",
     orig:"Prefer CLI tools over MCP when the CLI is good",
     body:`<p>Um servidor MCP ocupa contexto mesmo quando nenhuma ferramenta dele é usada. O equivalente em CLI, como <code>gh</code>, <code>aws</code>, <code>gcloud</code>, <code>sentry-cli</code> ou <code>kubectl</code>, não custa nada até o Claude chamá-lo. Depois da chamada, entra no contexto só a saída dela.</p>
     <p>Os autores recorrem ao MCP em três casos: quando o fluxo é de fato interativo, como automação de navegador ou preenchimento de formulário estruturado; quando falta alguma função na CLI; ou quando o servidor MCP é um invólucro fino sobre um schema tipado que eles querem que o Claude trate como ferramenta de primeira classe. Fora desses casos, a CLI vence.</p>
     <p>Na prática, uma sessão típica deles tem <strong>dois ou três servidores MCP ativos, não doze</strong>. Os que ficam ligados sempre são os que não dá para trocar por comandos de shell: a conexão com os sistemas internos de conteúdo, o acesso estruturado a uma planilha ou a um quadro, em que uma CLI genérica seria grosseira demais, e o servidor de automação de navegador, quando o trabalho pede.</p>`,
     note:{lbl:"O que a doc corrige", html:`<strong>O número do livro é do tempo em que tudo carregava de cara.</strong> O livro diz que um servidor MCP de 30 ferramentas pré-carrega de 30 a 40 mil tokens de definições. Hoje o <strong>MCP Tool Search vem ligado por padrão</strong>: no início da sessão entram só os nomes das ferramentas e as instruções do servidor, e o schema completo é buscado quando o Claude decide usar a ferramenta. O custo de um servidor parado caiu muito, mas não é zero.<br><strong>O número volta a valer em dois casos:</strong> com <code>ENABLE_TOOL_SEARCH=false</code>, ou quando <code>ANTHROPIC_BASE_URL</code> aponta para um gateway de terceiros. Nesses casos as ferramentas carregam todas de cara. Com <code>auto</code>, elas carregam de cara só se couberem em 10% do contexto.<br><strong>O conselho continua valendo.</strong> A própria doc de boas práticas diz que a CLI é "o jeito mais eficiente em contexto" de falar com serviços externos, e sugere, para uma CLI que o Claude não conhece, o prompt <code>Use 'foo-cli-tool --help' to learn about foo tool</code>.`},
-    docs:[["MCP","https://code.claude.com/docs/en/mcp"],["Best practices","https://code.claude.com/docs/en/best-practices"]] }
+    docs:[["MCP","https://code.claude.com/docs/en/mcp"],["Best practices","https://code.claude.com/docs/en/best-practices"]] },
+  { n:53, ch:8, here:true,
+    title:"Antes de mudar algo por MCP, leia o estado atual",
+    orig:"Always preflight with a get-current-state call before mutating",
+    body:`<p>Sempre que os autores mudam algo por um servidor MCP, a primeira ação é uma chamada que lê o estado atual. Num fluxo que acrescenta aulas a um curso já existente na plataforma de ensino deles, isso significa ler a lista de aulas do curso antes de criar qualquer aula nova. Num fluxo que atualiza o conteúdo de uma aula, significa ler o conteúdo atual primeiro.</p>
+    <p>O motivo é simples: <strong>servidores MCP não reportam de forma consistente os erros de estado parcial</strong>. Se o recurso está num estado inesperado, como um curso que já tem aulas, uma mudança às cegas ou falha de um jeito confuso ou, pior, dá certo e deixa o recurso num estado que ninguém queria.</p>
+    <p>Os autores escrevem a regra no SKILL.md de toda skill que muda estado externo, como no bloco abaixo. É a mesma disciplina de uma migração de banco que confere se a coluna existe antes de criá-la. A camada MCP só deixa isso mais importante, porque <strong>sobrescrever o recurso errado custa muito mais que uma leitura a mais</strong>.</p>`,
+    code:{lang:"SKILL.md", text:`If the destination already has content, ask the user whether to extend\nor stop. Do not silently overwrite.`},
+    note:{lbl:"Par com a dica 28", html:`É o portão "Reset ou Resume" da <a href="#dica-28">dica 28</a>, aplicado ao mundo lá fora. Lá, a skill confere a própria pasta de saída antes de escrever. Aqui, ela confere o recurso remoto antes de mudar. A frase que carrega as duas é a mesma: estado que já existe não é, por si só, autorização para sobrescrever.`} }
 ];
 
 /* ---------- render ---------- */
