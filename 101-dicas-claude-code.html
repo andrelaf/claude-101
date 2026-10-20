@@ -160,7 +160,9 @@
     font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.87em;
     background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:1px 5px;
   }
-  .tip ul{margin:0 0 10px; padding-left:18px; color:var(--ink-2); max-width:66ch}
+  .tip ul, .tip ol{margin:0 0 10px; padding-left:18px; color:var(--ink-2); max-width:66ch}
+  .tip ol{padding-left:22px}
+  .tip li strong{color:var(--ink); font-weight:600}
   .tip li{margin-bottom:5px}
   .tip li::marker{color:var(--accent)}
 
@@ -787,17 +789,48 @@ const TIPS = [
   { n:53, ch:8,
     title:"Antes de mudar algo por MCP, leia o estado atual",
     orig:"Always preflight with a get-current-state call before mutating",
-    body:`<p>Sempre que os autores mudam algo por um servidor MCP, a primeira ação é uma chamada que lê o estado atual. Num fluxo que acrescenta aulas a um curso já existente na plataforma de ensino deles, isso significa ler a lista de aulas do curso antes de criar qualquer aula nova. Num fluxo que atualiza o conteúdo de uma aula, significa ler o conteúdo atual primeiro.</p>
-    <p>O motivo é simples: <strong>servidores MCP não reportam de forma consistente os erros de estado parcial</strong>. Se o recurso está num estado inesperado, como um curso que já tem aulas, uma mudança às cegas ou falha de um jeito confuso ou, pior, dá certo e deixa o recurso num estado que ninguém queria.</p>
-    <p>Os autores escrevem a regra no SKILL.md de toda skill que muda estado externo, como no bloco abaixo. É a mesma disciplina de uma migração de banco que confere se a coluna existe antes de criá-la. A camada MCP só deixa isso mais importante, porque <strong>sobrescrever o recurso errado custa muito mais que uma leitura a mais</strong>.</p>`,
+    body:`<p>Quando uma skill vai mudar algo fora da sua máquina por um servidor MCP, os autores nunca começam pela gravação. A ordem é sempre esta:</p>
+    <ol>
+      <li><strong>Ler o estado atual.</strong> A primeira chamada é uma leitura do recurso que vai mudar. Para acrescentar aulas a um curso da plataforma de ensino deles, a skill lista as aulas que o curso já tem. Para atualizar o conteúdo de uma aula, ela lê o conteúdo atual.</li>
+      <li><strong>Comparar com o que o plano supõe.</strong> O plano conta com um curso vazio? Então confira se ele está mesmo vazio. Conta com uma aula em certo formato? Confira o formato.</li>
+      <li><strong>Se já houver conteúdo, parar e perguntar.</strong> A skill pergunta ao usuário se deve estender o que existe ou parar. Ela nunca sobrescreve em silêncio.</li>
+      <li><strong>Só então gravar</strong>, sabendo que o recurso está no estado esperado.</li>
+    </ol>
+    <p><strong>Exemplo.</strong> Você pede: "crie as aulas 1, 2 e 3 do curso Git Básico".</p>
+    <ul>
+      <li>Passo 1: a skill lista as aulas do curso, e a resposta traz duas que já existem: "Introdução" e "Commits".</li>
+      <li>Passo 2: o plano supunha um curso vazio. Não está.</li>
+      <li>Passo 3: em vez de criar, o Claude pergunta: "O curso Git Básico já tem 2 aulas (Introdução, Commits). Acrescento as novas depois delas ou paro aqui?"</li>
+      <li>Passo 4: você responde "acrescente", e as novas entram como aulas 3, 4 e 5, sem tocar nas que já existiam.</li>
+    </ul>
+    <p>Sem o passo 1, a skill criaria outra "aula 1" e outra "aula 2" por cima do curso, e talvez nenhum erro aparecesse.</p>
+    <p>Por que não gravar direto? Porque <strong>servidores MCP não reportam de forma consistente os erros de estado parcial</strong>. Imagine que o curso já tem três aulas e a skill cria mais três sem olhar. Ou a chamada falha com uma mensagem confusa ou, pior, dá certo e deixa o curso num estado que ninguém queria, com aulas duplicadas ou trocadas.</p>
+    <p>Para a regra valer sempre, os autores a escrevem no SKILL.md de toda skill que muda estado externo, como no bloco abaixo. É a mesma disciplina de uma migração de banco que confere se a coluna existe antes de criá-la. Com MCP ela pesa mais, porque <strong>sobrescrever o recurso errado custa muito mais que uma leitura a mais</strong>.</p>`,
     code:{lang:"SKILL.md", text:`If the destination already has content, ask the user whether to extend\nor stop. Do not silently overwrite.`},
     note:{lbl:"Par com a dica 28", html:`É o portão "Reset ou Resume" da <a href="#dica-28">dica 28</a>, aplicado ao mundo lá fora. Lá, a skill confere a própria pasta de saída antes de escrever. Aqui, ela confere o recurso remoto antes de mudar. A frase que carrega as duas é a mesma: estado que já existe não é, por si só, autorização para sobrescrever.`} },
   { n:54, ch:8, here:true,
     title:"Depois de gravar, releia e confira que um campo voltou intacto",
     orig:"After every write, re-read and verify a known field round-tripped",
-    body:`<p>Em todos os fluxos de publicação dos autores, o padrão é o mesmo: gravar pelo MCP, reler o recurso, conferir que um campo conhecido fez a ida e volta intacto e só então mudar o recurso para o estado público.</p>
-    <p>Num fluxo que cria uma aula nova com imagens embutidas, a verificação é o bloco abaixo: a URL da primeira imagem enviada aparece no corpo devolvido, o tamanho do conteúdo bate com o que foi gravado (com uma folga para diferenças de codificação), e o título e o slug são os que foram definidos. Se algo falhar, a skill aponta a divergência e não publica.</p>
-    <p>Sem essa conferência, <strong>um erro silencioso vai direto para o ar</strong>, como uma URL de imagem que não foi salva ou um corpo truncado na ida e volta pelo MCP. Com ela, a mesma falha deixa a aula como rascunho, onde dá para corrigir antes que alguém leia. O custo é uma leitura a mais por gravação. Segundo os autores, desde que adotaram o padrão nunca tiveram uma aula publicada com imagem quebrada. <strong>A troca compensa sempre.</strong></p>`,
+    body:`<p>A <a href="#dica-53">dica 53</a> cuida do que vem antes da gravação. Esta cuida do que vem depois. Em todos os fluxos de publicação dos autores, os passos são os mesmos. Veja com o exemplo de uma aula nova com imagens embutidas:</p>
+    <ol>
+      <li><strong>Gravar, ainda sem publicar.</strong> A skill salva a aula pelo MCP. Ela continua fora do ar.</li>
+      <li><strong>Reler o recurso.</strong> Uma nova chamada busca a aula como ela ficou salva do outro lado.</li>
+      <li><strong>Conferir campos que você conhece.</strong> A skill compara o que voltou com o que ela mandou, nos pontos listados no bloco abaixo:
+        <ul>
+          <li>a URL da primeira imagem enviada aparece no corpo devolvido;</li>
+          <li>o tamanho do conteúdo bate com o que foi gravado, com uma folga para diferenças de codificação;</li>
+          <li>o título e o slug são os que foram definidos.</li>
+        </ul></li>
+      <li><strong>Decidir.</strong> Se tudo bate, a skill muda a aula para pública. Se algo diverge, ela diz qual campo falhou e para ali, e a aula fica como rascunho.</li>
+    </ol>
+    <p><strong>Exemplo.</strong> A skill grava a aula "Branches", com slug <code>branches</code>, duas imagens e 4.200 caracteres.</p>
+    <ul>
+      <li>Passo 2: ela relê a aula salva.</li>
+      <li>Passo 3: o título e o slug batem. O tamanho voltou como 4.180, dentro da folga. Mas a URL da primeira imagem, <code>branch-diagram.png</code>, não aparece no corpo, porque a imagem não foi salva.</li>
+      <li>Passo 4: a skill não publica e avisa: "A URL da primeira imagem (branch-diagram.png) não aparece no corpo salvo. A aula ficou como rascunho."</li>
+    </ul>
+    <p>Você reenvia a imagem, a conferência passa, e só então a aula vai ao ar. Sem o passo 3, os alunos teriam visto uma imagem quebrada.</p>
+    <p>Sem essa conferência, <strong>um erro silencioso vai direto para o ar</strong>, como uma URL de imagem que não foi salva ou um corpo truncado na ida e volta pelo MCP. Com ela, a mesma falha fica presa no rascunho, onde dá para corrigir antes que alguém leia. O custo é uma leitura a mais por gravação. Segundo os autores, desde que adotaram o padrão nunca tiveram uma aula publicada com imagem quebrada. <strong>A troca compensa sempre.</strong></p>`,
     code:{lang:"SKILL.md", text:`After saving the lesson, re-read it. Check that:\n\n- The first uploaded image's source URL appears in the returned\n  content body.\n- The content length matches what we wrote, within encoding-difference\n  tolerance.\n- The title and slug match what we set.\n\nIf any check fails, report the specific mismatch. Do not proceed to\npublishing.`},
     note:{lbl:"Par com a dica 53", html:`A <a href="#dica-53">dica 53</a> lê o estado <em>antes</em> de mudar e esta lê <em>depois</em>. Juntas, elas cercam a gravação dos dois lados, e o passo arriscado (publicar) só vem quando as duas leituras confirmam o que se esperava.`},
     docs:[["MCP","https://code.claude.com/docs/en/mcp"]] }
