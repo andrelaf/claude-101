@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 54</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 55</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;54<br>(capítulos 1 a 8)</p>
+      <p>Cobertura atual: dicas 1&ndash;55<br>(capítulos 1 a 8)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 54 de 101</b></span>
+        <span>Leitura: <b>dica 55 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 8</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -808,7 +808,7 @@ const TIPS = [
     <p>Para a regra valer sempre, os autores a escrevem no SKILL.md de toda skill que muda estado externo, como no bloco abaixo. É a mesma disciplina de uma migração de banco que confere se a coluna existe antes de criá-la. Com MCP ela pesa mais, porque <strong>sobrescrever o recurso errado custa muito mais que uma leitura a mais</strong>.</p>`,
     code:{lang:"SKILL.md", text:`If the destination already has content, ask the user whether to extend\nor stop. Do not silently overwrite.`},
     note:{lbl:"Par com a dica 28", html:`É o portão "Reset ou Resume" da <a href="#dica-28">dica 28</a>, aplicado ao mundo lá fora. Lá, a skill confere a própria pasta de saída antes de escrever. Aqui, ela confere o recurso remoto antes de mudar. A frase que carrega as duas é a mesma: estado que já existe não é, por si só, autorização para sobrescrever.`} },
-  { n:54, ch:8, here:true,
+  { n:54, ch:8,
     title:"Depois de gravar, releia e confira que um campo voltou intacto",
     orig:"After every write, re-read and verify a known field round-tripped",
     body:`<p>A <a href="#dica-53">dica 53</a> cuida do que vem antes da gravação. Esta cuida do que vem depois. Em todos os fluxos de publicação dos autores, os passos são os mesmos. Veja com o exemplo de uma aula nova com imagens embutidas:</p>
@@ -833,7 +833,21 @@ const TIPS = [
     <p>Sem essa conferência, <strong>um erro silencioso vai direto para o ar</strong>, como uma URL de imagem que não foi salva ou um corpo truncado na ida e volta pelo MCP. Com ela, a mesma falha fica presa no rascunho, onde dá para corrigir antes que alguém leia. O custo é uma leitura a mais por gravação. Segundo os autores, desde que adotaram o padrão nunca tiveram uma aula publicada com imagem quebrada. <strong>A troca compensa sempre.</strong></p>`,
     code:{lang:"SKILL.md", text:`After saving the lesson, re-read it. Check that:\n\n- The first uploaded image's source URL appears in the returned\n  content body.\n- The content length matches what we wrote, within encoding-difference\n  tolerance.\n- The title and slug match what we set.\n\nIf any check fails, report the specific mismatch. Do not proceed to\npublishing.`},
     note:{lbl:"Par com a dica 53", html:`A <a href="#dica-53">dica 53</a> lê o estado <em>antes</em> de mudar e esta lê <em>depois</em>. Juntas, elas cercam a gravação dos dois lados, e o passo arriscado (publicar) só vem quando as duas leituras confirmam o que se esperava.`},
-    docs:[["MCP","https://code.claude.com/docs/en/mcp"]] }
+    docs:[["MCP","https://code.claude.com/docs/en/mcp"]] },
+  { n:55, ch:8, here:true,
+    title:"Mudanças por MCP que dependem de ordem: em sequência, não em paralelo",
+    orig:"Sequential, not parallel, for ordering-sensitive mutations",
+    body:`<p>Algumas mudanças por MCP mexem numa ordem global. Exemplos: criar vários itens dentro de um pai que guarda a posição de cada um num campo como <code>menu_order</code>, ou criar linhas numeradas numa planilha. Em geral, qualquer caso em que um campo de posição é estado compartilhado. Nesses casos, os autores fazem as chamadas <strong>uma depois da outra</strong>. Chamadas em paralelo deixam a ordem final imprevisível e às vezes uma atrapalha a outra: duas leem a mesma posição como livre e as duas gravam nela.</p>
+    <p>Quando um fluxo cria vários itens ordenados, os autores põem no SKILL.md a regra do bloco abaixo. Ela tem duas partes:</p>
+    <ol>
+      <li><strong>Criar em sequência, encadeando.</strong> Cada item novo é criado informando o anterior (<code>previousItemId</code>), e só depois que a chamada anterior terminou.</li>
+      <li><strong>Reordenar uma vez no fim.</strong> Depois de criar tudo, a skill chama o endpoint de reordenação com a lista completa, na ordem certa.</li>
+    </ol>
+    <p>O encadeamento já basta quando tudo corre normalmente. A reordenação final é um <strong>seguro barato</strong>: se algum estado intermediário tiver desandado, essa última chamada põe tudo na ordem certa.</p>
+    <p><strong>Exemplo.</strong> Você pede três aulas novas no fim do curso: "Branches", "Merge" e "Rebase". Em paralelo, as três leem a posição livre ao mesmo tempo e podem acabar como 3, 3 e 4, ou numa ordem trocada. Em sequência, "Branches" entra depois da última aula, "Merge" entra depois de "Branches" e "Rebase" depois de "Merge". No fim, a skill manda a lista completa uma vez, e a ordem fica garantida.</p>`,
+    code:{lang:"SKILL.md", text:`Do not parallelize the create calls. Each new item mutates the\nparent's \`menu_order\`, and parallel calls produce inconsistent\nordering. Create sequentially with \`previousItemId\` chaining, then call\nthe reorder endpoint once at the end with the full ordered array as a\nsafety net.`},
+    note:{lbl:"O que a doc corrige", html:`<strong>Dentro de um turno, o Claude Code já faz as escritas em sequência.</strong> Pela doc do Agent SDK, quando o Claude pede várias ferramentas de uma vez, só as somente leitura rodam em paralelo: <code>Read</code>, <code>Glob</code>, <code>Grep</code> e as ferramentas MCP marcadas com <code>readOnlyHint</code>. As que mudam estado rodam uma de cada vez, e <code>readOnlyHint</code> vale <code>false</code> por padrão.<br><strong>A regra continua valendo assim mesmo, por três motivos.</strong> A anotação é uma declaração do próprio servidor, não uma garantia: um servidor que marque uma escrita como <code>readOnlyHint: true</code> faz essa escrita rodar em paralelo. Subagentes ou sessões rodando ao mesmo tempo fazem cada um as suas chamadas. E rodar em sequência não encadeia nada sozinho: quem passa o <code>previousItemId</code> certo é a skill.`},
+    docs:[["MCP","https://code.claude.com/docs/en/mcp"],["Agent loop","https://code.claude.com/docs/en/agent-sdk/agent-loop"]] }
 ];
 
 /* ---------- render ---------- */
