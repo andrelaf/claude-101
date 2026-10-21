@@ -89,6 +89,15 @@ Entrada nova aqui só depois de um erro que de fato aconteceu.
   e o bloco multilinha que começa em `mktemp` não casam com `Bash(grep *)` no
   `allowed-tools`. Não é falha: é casamento por prefixo funcionando. Bloco de shell
   arbitrário deve mesmo pedir passagem.
+- **O `paths:` esconde esta skill de quem precisa chamá-la.** Na dica 57
+  (2026-10-20), a fase 4 da `/nova-dica` tentou invocá-la e levou
+  `Unknown skill: revisar-pagina-dicas`. O `paths: "**/*.html"` só registra a skill
+  quando o Claude **lê** um `.html` com a ferramenta Read, e naquela sessão a página
+  só tinha sido tocada por `grep` e `python` no Bash. É o mesmo problema que tirou o
+  `paths:` da `/nova-dica` em 2026-09-21. As checagens do Workflow rodaram à mão e
+  o relatório saiu no mesmo formato. Tirar o `paths:` daqui é mudança de
+  comportamento e cabe ao usuário. Enquanto ele não decide, quem depende desta skill
+  roda o Workflow à mão e diz isso no relatório.
 
 **Manutenção desta seção.** Ao terminar uma revisão que tenha deixado passar algo,
 acrescentar aqui a checagem que faltava, e o passo correspondente no Workflow.

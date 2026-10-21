@@ -51,6 +51,13 @@ de fato aconteceu, nunca preventivamente.
   tem exceção para arquivos que parecem descartáveis. Se um esboço não deve ficar,
   ele não deve ser criado: rascunho que só serve ao portão B vai no chat.
 
+- **A fase 4 pode não achar a `/revisar-pagina-dicas`.** Na dica 57 o Skill tool
+  respondeu `Unknown skill`, porque o `paths:` da skill de revisão só a registra
+  depois de um Read num `.html`. Rodar as 7 checagens do Workflow dela à mão, gravar
+  o `revisao.txt` no formato de saída dela e dizer no próprio arquivo que a revisão
+  foi manual. A `/publicar-dicas` exige essa revisão no passo 1, então a nota manual
+  precisa estar escrita para o usuário poder aceitá-la ou recusá-la.
+
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS` no relatório
 final é candidata a virar entrada aqui. Sem essa revisão, a seção congela na versão um
