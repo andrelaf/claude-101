@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 56</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 57</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;56<br>(capítulos 1 a 8)</p>
+      <p>Cobertura atual: dicas 1&ndash;57<br>(capítulos 1 a 8)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 56 de 101</b></span>
+        <span>Leitura: <b>dica 57 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 8</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -848,7 +848,7 @@ const TIPS = [
     code:{lang:"SKILL.md", text:`Do not parallelize the create calls. Each new item mutates the\nparent's \`menu_order\`, and parallel calls produce inconsistent\nordering. Create sequentially with \`previousItemId\` chaining, then call\nthe reorder endpoint once at the end with the full ordered array as a\nsafety net.`},
     note:{lbl:"O que a doc corrige", html:`<strong>Dentro de um turno, o Claude Code já faz as escritas em sequência.</strong> Pela doc do Agent SDK, quando o Claude pede várias ferramentas de uma vez, só as somente leitura rodam em paralelo: <code>Read</code>, <code>Glob</code>, <code>Grep</code> e as ferramentas MCP marcadas com <code>readOnlyHint</code>. As que mudam estado rodam uma de cada vez, e <code>readOnlyHint</code> vale <code>false</code> por padrão.<br><strong>A regra continua valendo assim mesmo, por três motivos.</strong> A anotação é uma declaração do próprio servidor, não uma garantia: um servidor que marque uma escrita como <code>readOnlyHint: true</code> faz essa escrita rodar em paralelo. Subagentes ou sessões rodando ao mesmo tempo fazem cada um as suas chamadas. E rodar em sequência não encadeia nada sozinho: quem passa o <code>previousItemId</code> certo é a skill.`},
     docs:[["MCP","https://code.claude.com/docs/en/mcp"],["Agent loop","https://code.claude.com/docs/en/agent-sdk/agent-loop"]] },
-  { n:56, ch:8, here:true,
+  { n:56, ch:8,
     title:"Se a conferência falhar, não publique: deixe como rascunho",
     orig:"Hold publish on mismatch, leave the resource as draft",
     body:`<p>A <a href="#dica-54">dica 54</a> confere a gravação antes de publicar. Esta diz o que fazer quando a conferência falha. A regra fixa dos autores em todos os fluxos de conteúdo é <strong>o recurso fica como rascunho</strong>. A partir daí, o caminho é este:</p>
@@ -864,7 +864,26 @@ const TIPS = [
       <li>antes de mudar uma página de rascunho para pública, conferir que o conteúdo fez a ida e volta intacto.</li>
     </ul>
     <p>A postura é <strong>conservadora de propósito</strong>. Todo passo que muda o estado público é irreversível, e todo passo que deixa algo em rascunho é reversível. Os autores desenham cada fluxo para que, em qualquer ponto de falha, o pior caso seja "o usuário vai ter que publicar o rascunho à mão", e nunca "vamos ter que desfazer algo que o público já viu".</p>`,
-    note:{lbl:"Trio com as dicas 53 e 54", html:`As três dicas formam um só fluxo em volta de uma gravação por MCP. A <a href="#dica-53">53</a> lê o estado antes de mudar. A <a href="#dica-54">54</a> relê depois de gravar. Esta decide o que acontece quando a releitura não bate. Juntas, elas garantem que o único passo sem volta, publicar, só aconteça com as duas leituras confirmando o que se esperava.`} }
+    note:{lbl:"Trio com as dicas 53 e 54", html:`As três dicas formam um só fluxo em volta de uma gravação por MCP. A <a href="#dica-53">53</a> lê o estado antes de mudar. A <a href="#dica-54">54</a> relê depois de gravar. Esta decide o que acontece quando a releitura não bate. Juntas, elas garantem que o único passo sem volta, publicar, só aconteça com as duas leituras confirmando o que se esperava.`} },
+
+  { n:57, ch:8, here:true,
+    title:"Depois de registrar um servidor MCP, confira com <code>claude mcp list</code> e <code>/mcp</code>",
+    orig:"Always run claude mcp list and /mcp after registering a new server",
+    body:`<p>Registrar um servidor MCP é um comando, e conferir se ele funciona é outro. Os autores rodam os dois, sempre. O Claude Code aceita o registro mesmo quando o servidor não está saudável. O sintoma, o Claude não enxergar as ferramentas esperadas, só aparece depois, no meio de um fluxo.</p>
+    <p>A rotina tem três passos:</p>
+    <ol>
+      <li><strong>Registrar</strong> com <code>claude mcp add</code>.</li>
+      <li><strong>Conferir no terminal</strong> com <code>claude mcp list</code>, que mostra se o servidor está na lista.</li>
+      <li><strong>Conferir dentro da sessão</strong> com <code>/mcp</code>, que mostra as ferramentas que o servidor expõe.</li>
+    </ol>
+    <p>Se o <code>/mcp</code> não mostra nenhuma ferramenta do servidor, ele está registrado mas não está rodando. Também pode ser que o transporte esteja errado ou que o comando falhe no PATH do agente. O diagnóstico acontece <strong>na hora do registro</strong>, e não depois que o fluxo travou no meio.</p>
+    <p>Um terceiro comando ajuda quando se suspeita que a configuração mudou: <code>claude mcp get &lt;nome&gt;</code>. Ele mostra o comando de inicialização completo, o escopo e o transporte de um servidor. É o que os autores leem na hora de limpar experimentos antigos.</p>`,
+    code:[
+      {lang:"terminal", text:`claude mcp add <nome> -- <comando> [args...]\n\nclaude mcp list   # o servidor aparece, com o status da conexão`},
+      {lang:"na sessão interativa", text:`/mcp              # lista as ferramentas que o servidor expõe`}
+    ],
+    note:{lbl:"O que a doc corrige", html:`<strong>O comando de registro leva <code>--</code>.</strong> O livro escreve <code>claude mcp add &lt;name&gt; &lt;command&gt; [args...]</code>. Pela doc atual, num servidor local (stdio), tudo o que vem depois do separador <code>--</code> é o comando que o Claude Code roda, como em <code>claude mcp add playwright -- npx -y @playwright/mcp@latest</code>. Sem o <code>--</code>, o comando pode ser gravado errado. O bloco acima já usa a forma da doc.<br><strong>O <code>claude mcp list</code> faz mais do que o livro diz.</strong> Além de listar, ele testa a conexão e mostra <code>✔ Connected</code> ou <code>✘ Failed to connect</code>, com o detalhe do erro. Na primeira vez pode aparecer <code>Failed to connect</code> enquanto o <code>npx</code> baixa o pacote. Nesse caso, vale esperar e rodar de novo.`},
+    docs:[["MCP","https://code.claude.com/docs/en/mcp"]] }
 ];
 
 /* ---------- render ---------- */
