@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 57</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 58</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;57<br>(capítulos 1 a 8)</p>
+      <p>Cobertura atual: dicas 1&ndash;58<br>(capítulos 1 a 8)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 57 de 101</b></span>
+        <span>Leitura: <b>dica 58 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 8</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -866,7 +866,7 @@ const TIPS = [
     <p>A postura é <strong>conservadora de propósito</strong>. Todo passo que muda o estado público é irreversível, e todo passo que deixa algo em rascunho é reversível. Os autores desenham cada fluxo para que, em qualquer ponto de falha, o pior caso seja "o usuário vai ter que publicar o rascunho à mão", e nunca "vamos ter que desfazer algo que o público já viu".</p>`,
     note:{lbl:"Trio com as dicas 53 e 54", html:`As três dicas formam um só fluxo em volta de uma gravação por MCP. A <a href="#dica-53">53</a> lê o estado antes de mudar. A <a href="#dica-54">54</a> relê depois de gravar. Esta decide o que acontece quando a releitura não bate. Juntas, elas garantem que o único passo sem volta, publicar, só aconteça com as duas leituras confirmando o que se esperava.`} },
 
-  { n:57, ch:8, here:true,
+  { n:57, ch:8,
     title:"Depois de registrar um servidor MCP, confira com <code>claude mcp list</code> e <code>/mcp</code>",
     orig:"Always run claude mcp list and /mcp after registering a new server",
     body:`<p>Registrar um servidor MCP é um comando, e conferir se ele funciona é outro. Os autores rodam os dois, sempre. O Claude Code aceita o registro mesmo quando o servidor não está saudável. O sintoma, o Claude não enxergar as ferramentas esperadas, só aparece depois, no meio de um fluxo.</p>
@@ -883,7 +883,23 @@ const TIPS = [
       {lang:"na sessão interativa", text:`/mcp              # lista as ferramentas que o servidor expõe`}
     ],
     note:{lbl:"O que a doc corrige", html:`<strong>O comando de registro leva <code>--</code>.</strong> O livro escreve <code>claude mcp add &lt;name&gt; &lt;command&gt; [args...]</code>. Pela doc atual, num servidor local (stdio), tudo o que vem depois do separador <code>--</code> é o comando que o Claude Code roda, como em <code>claude mcp add playwright -- npx -y @playwright/mcp@latest</code>. Sem o <code>--</code>, o comando pode ser gravado errado. O bloco acima já usa a forma da doc.<br><strong>O <code>claude mcp list</code> faz mais do que o livro diz.</strong> Além de listar, ele testa a conexão e mostra <code>✔ Connected</code> ou <code>✘ Failed to connect</code>, com o detalhe do erro. Na primeira vez pode aparecer <code>Failed to connect</code> enquanto o <code>npx</code> baixa o pacote. Nesse caso, vale esperar e rodar de novo.`},
-    docs:[["MCP","https://code.claude.com/docs/en/mcp"]] }
+    docs:[["MCP","https://code.claude.com/docs/en/mcp"]] },
+  { n:58, ch:8, here:true,
+    title:"Nome de branch no <code>create_pull_request</code> do MCP diferencia maiúsculas",
+    orig:"Branch names from MCP create_pull_request are case-sensitive",
+    body:`<p>Este é um dos erros de MCP mais fáceis de deixar passar. A mensagem de erro parece segura de si, mas não aponta para a causa.</p>
+    <p>O caso que os autores viveram:</p>
+    <ol>
+      <li>O Claude fez push de um branch chamado <code>feature/issue-1-localstorage-persistence</code>, tudo em minúsculas.</li>
+      <li>Depois chamou a ferramenta <code>create_pull_request</code> do GitHub MCP com <code>head: "feature/issue-1-localStorage-persistence"</code>, com o <code>S</code> maiúsculo. A grafia veio do nome de uma variável que tinha aparecido antes na conversa.</li>
+      <li>O GitHub respondeu 422, "branch not found". O Claude tentou mais duas vezes com variações parecidas.</li>
+    </ol>
+    <p>A correção era uma letra de diferença na caixa.</p>
+    <p>A lição tem duas partes. Primeiro: quando um <code>create_pull_request</code> falha com erro de branch, <strong>confira a caixa antes de qualquer outra coisa</strong>. Nomes de branch no GitHub diferenciam maiúsculas de minúsculas, e muitas ferramentas que lidam com eles não diferenciam. Segundo: uma armadilha que volta sempre merece uma convenção explícita no <code>CLAUDE.md</code> ou no <code>AGENTS.md</code>. Com a convenção escrita, o modelo para de inventar variações.</p>
+    <p>O mesmo problema aparece em outros MCPs que embrulham APIs sensíveis à caixa: chaves do S3, tags de container, nomes de pacote. Quando algo que "deveria funcionar" devolve "não encontrado", a caixa é a primeira coisa a conferir.</p>`,
+    code:{lang:"CLAUDE.md", text:`Branch names use lowercase kebab-case, exactly. Format: feature/<issue-number>-<short-description>.`},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>CLAUDE.md é o lugar certo.</strong> As boas práticas da doc listam "convenções de nome de branch e de PR" entre o que deve entrar no <code>CLAUDE.md</code>.<br><strong>O <code>AGENTS.md</code> nem sempre é lido.</strong> Por padrão, o Claude Code só o lê como instruções de projeto quando o repositório <em>não</em> tem <code>CLAUDE.md</code> (v2.1.277 ou mais nova). Para ler os dois, mude a opção <strong>Project instructions</strong> no <code>/config</code>, ou importe com <code>@AGENTS.md</code> de dentro do <code>CLAUDE.md</code>. Se o repositório já tem um <code>CLAUDE.md</code>, uma convenção escrita só no <code>AGENTS.md</code> pode nunca chegar ao Claude.`},
+    docs:[["Boas práticas — CLAUDE.md","https://code.claude.com/docs/en/best-practices"],["GitHub MCP Server","https://github.com/github/github-mcp-server"]] }
 ];
 
 /* ---------- render ---------- */
