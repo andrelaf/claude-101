@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 58</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 59</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;58<br>(capítulos 1 a 8)</p>
+      <p>Cobertura atual: dicas 1&ndash;59<br>(capítulos 1 a 8)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 58 de 101</b></span>
+        <span>Leitura: <b>dica 59 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 8</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -884,7 +884,7 @@ const TIPS = [
     ],
     note:{lbl:"O que a doc corrige", html:`<strong>O comando de registro leva <code>--</code>.</strong> O livro escreve <code>claude mcp add &lt;name&gt; &lt;command&gt; [args...]</code>. Pela doc atual, num servidor local (stdio), tudo o que vem depois do separador <code>--</code> é o comando que o Claude Code roda, como em <code>claude mcp add playwright -- npx -y @playwright/mcp@latest</code>. Sem o <code>--</code>, o comando pode ser gravado errado. O bloco acima já usa a forma da doc.<br><strong>O <code>claude mcp list</code> faz mais do que o livro diz.</strong> Além de listar, ele testa a conexão e mostra <code>✔ Connected</code> ou <code>✘ Failed to connect</code>, com o detalhe do erro. Na primeira vez pode aparecer <code>Failed to connect</code> enquanto o <code>npx</code> baixa o pacote. Nesse caso, vale esperar e rodar de novo.`},
     docs:[["MCP","https://code.claude.com/docs/en/mcp"]] },
-  { n:58, ch:8, here:true,
+  { n:58, ch:8,
     title:"Nome de branch no <code>create_pull_request</code> do MCP diferencia maiúsculas",
     orig:"Branch names from MCP create_pull_request are case-sensitive",
     body:`<p>Este é um dos erros de MCP mais fáceis de deixar passar. A mensagem de erro parece segura de si, mas não aponta para a causa.</p>
@@ -899,7 +899,21 @@ const TIPS = [
     <p>O mesmo problema aparece em outros MCPs que embrulham APIs sensíveis à caixa: chaves do S3, tags de container, nomes de pacote. Quando algo que "deveria funcionar" devolve "não encontrado", a caixa é a primeira coisa a conferir.</p>`,
     code:{lang:"CLAUDE.md", text:`Branch names use lowercase kebab-case, exactly. Format: feature/<issue-number>-<short-description>.`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>CLAUDE.md é o lugar certo.</strong> As boas práticas da doc listam "convenções de nome de branch e de PR" entre o que deve entrar no <code>CLAUDE.md</code>.<br><strong>O <code>AGENTS.md</code> nem sempre é lido.</strong> Por padrão, o Claude Code só o lê como instruções de projeto quando o repositório <em>não</em> tem <code>CLAUDE.md</code> (v2.1.277 ou mais nova). Para ler os dois, mude a opção <strong>Project instructions</strong> no <code>/config</code>, ou importe com <code>@AGENTS.md</code> de dentro do <code>CLAUDE.md</code>. Se o repositório já tem um <code>CLAUDE.md</code>, uma convenção escrita só no <code>AGENTS.md</code> pode nunca chegar ao Claude.`},
-    docs:[["Boas práticas — CLAUDE.md","https://code.claude.com/docs/en/best-practices"],["GitHub MCP Server","https://github.com/github/github-mcp-server"]] }
+    docs:[["Boas práticas — CLAUDE.md","https://code.claude.com/docs/en/best-practices"],["GitHub MCP Server","https://github.com/github/github-mcp-server"]] },
+  { n:59, ch:8, here:true,
+    title:"Tool Search: o Claude só carrega o schema da ferramenta MCP quando vai usá-la",
+    orig:"Use Tool Search to defer MCP tool definitions",
+    body:`<p>Com o Tool Search, as definições das ferramentas MCP não entram inteiras no contexto no início da sessão. O Claude vê só os nomes das ferramentas disponíveis e as instruções de cada servidor. O schema completo de uma ferramenta é carregado <strong>na hora em que ele decide chamá-la</strong>. Segundo relatos da comunidade citados pelos autores, isso corta cerca de 47% do contexto gasto em setups com muitos servidores MCP.</p>
+    <p>No Claude Code atual, isso já vem ligado: não é preciso configurar nada. A <a href="#dica-52">dica 52</a> mostra o que isso mudou na conta de quanto um servidor parado custa.</p>
+    <p>O único porém que os autores encontraram:</p>
+    <ol>
+      <li><strong>O sintoma.</strong> Um servidor cujas ferramentas são usadas em todo turno também fica adiado, e a primeira chamada dele demora mais.</li>
+      <li><strong>A correção.</strong> Acrescentar <code>"alwaysLoad": true</code> na entrada desse servidor no <code>.mcp.json</code>. As ferramentas dele entram com o schema completo desde o primeiro turno.</li>
+      <li><strong>O resultado.</strong> O servidor interno dos autores fica sempre carregado, e todos os outros continuam adiados. No saldo, o contexto ganha.</li>
+    </ol>`,
+    code:{lang:".mcp.json", text:`{\n  "mcpServers": {\n    "internal": {\n      "command": "node",\n      "args": ["./mcp-servers/internal/dist/index.js"],\n      "alwaysLoad": true\n    }\n  }\n}`},
+    note:{lbl:"O que a doc corrige", html:`<strong>Não é preciso ligar o Tool Search.</strong> O livro manda definir <code>ENABLE_TOOL_SEARCH=auto:5</code> para ativá-lo. Hoje ele é o padrão: com a variável sem valor, o Claude Code adia todas as ferramentas MCP. O <code>auto:5</code> faz outra coisa: é um limiar, e carrega tudo de cara quando as definições cabem em 5% do contexto (<code>auto</code> sozinho usa 10%). Os outros valores: <code>true</code> mantém o adiamento mesmo quando <code>ANTHROPIC_BASE_URL</code> aponta para um gateway de terceiros, que é o único caso em que o padrão carrega tudo de cara; <code>false</code> desliga.<br><strong>A chave do <code>.mcp.json</code> é <code>mcpServers</code>.</strong> O exemplo do livro usa <code>"servers"</code>, que o Claude Code não lê como lista de servidores. O bloco acima já está corrigido.<br><strong>O <code>alwaysLoad</code> tem um custo.</strong> O Claude Code espera esse servidor conectar antes de começar, até um prazo limite. Os outros conectam em segundo plano.<br><strong>Modelos.</strong> Funciona a partir de Opus 4, Sonnet 4 e Haiku 4.5. Na Agent Platform do Google Cloud, só a partir das versões 4.5. Em modelos anteriores, tudo carrega de cara, qualquer que seja o valor da variável.`},
+    docs:[["MCP","https://code.claude.com/docs/en/mcp"],["Variáveis de ambiente","https://code.claude.com/docs/en/env-vars"]] }
 ];
 
 /* ---------- render ---------- */
