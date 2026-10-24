@@ -105,6 +105,12 @@ Primeira execução em 2026-09-22, publicando as dicas 31 e 32.
   publicar e subir"), e uma resposta só cobriu commit, republicação e push. O push
   muda estado externo, então continua exigindo a palavra do usuário — mas a pergunta
   cabe no passo 3, não num turno extra depois do relatório.
+- **"Pode publicar" sozinho não cobre o push.** Nas dicas 58 e 59 a pergunta do passo
+  3 foi "publicar e subir?" e a resposta veio só com "pode publicar". Nas duas vezes o
+  commit e a republicação rodaram e o push ficou esperando. Na dica 58 o usuário pediu
+  o push no turno seguinte. A frase do Workflow é a de publicar, e o push muda estado
+  externo, então não pode ser inferido de uma resposta que não fala dele. O relatório
+  diz que `main` ficou à frente de `origin/main` e pergunta de novo, numa linha.
 
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS MANUAIS` no
