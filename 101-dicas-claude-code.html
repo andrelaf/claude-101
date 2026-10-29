@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 60</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 61</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;60<br>(capítulos 1 a 9)</p>
+      <p>Cobertura atual: dicas 1&ndash;61<br>(capítulos 1 a 9)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 60 de 101</b></span>
+        <span>Leitura: <b>dica 61 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 9</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -916,7 +916,7 @@ const TIPS = [
     code:{lang:".mcp.json", text:`{\n  "mcpServers": {\n    "internal": {\n      "command": "node",\n      "args": ["./mcp-servers/internal/dist/index.js"],\n      "alwaysLoad": true\n    }\n  }\n}`},
     note:{lbl:"O que a doc corrige", html:`<strong>Não é preciso ligar o Tool Search.</strong> O livro manda definir <code>ENABLE_TOOL_SEARCH=auto:5</code> para ativá-lo. Hoje ele é o padrão: com a variável sem valor, o Claude Code adia todas as ferramentas MCP. O <code>auto:5</code> faz outra coisa: é um limiar, e carrega tudo de cara quando as definições cabem em 5% do contexto (<code>auto</code> sozinho usa 10%). Os outros valores: <code>true</code> mantém o adiamento mesmo quando <code>ANTHROPIC_BASE_URL</code> aponta para um gateway de terceiros, que é o único caso em que o padrão carrega tudo de cara; <code>false</code> desliga.<br><strong>A chave do <code>.mcp.json</code> é <code>mcpServers</code>.</strong> O exemplo do livro usa <code>"servers"</code>, que o Claude Code não lê como lista de servidores. O bloco acima já está corrigido.<br><strong>O <code>alwaysLoad</code> tem um custo.</strong> O Claude Code espera esse servidor conectar antes de começar, até um prazo limite. Os outros conectam em segundo plano.<br><strong>Modelos.</strong> Funciona a partir de Opus 4, Sonnet 4 e Haiku 4.5. Na Agent Platform do Google Cloud, só a partir das versões 4.5. Em modelos anteriores, tudo carrega de cara, qualquer que seja o valor da variável.`},
     docs:[["MCP","https://code.claude.com/docs/en/mcp"],["Variáveis de ambiente","https://code.claude.com/docs/en/env-vars"]] },
-  { n:60, ch:9, here:true,
+  { n:60, ch:9,
     title:"Mande para um subagente a tarefa paralela que encheria o contexto principal",
     orig:"Use a subagent any time a side task would flood your main context",
     body:`<p>A melhor regra para decidir quando usar um subagente: se a tarefa envolve resultados de busca, despejo de logs ou conteúdo de arquivos que você <strong>não vai consultar de novo</strong>, rode-a num subagente. Ele faz o trabalho barulhento e devolve um resumo limpo. O barulho fica fora da conversa principal.</p>
@@ -928,7 +928,20 @@ const TIPS = [
     </ul>
     <p>O caso oposto é quando a tarefa precisa do conteúdo inteiro na atenção principal. Uma refatoração que mexe na mesma lógica em muitos arquivos costuma sair melhor quando o agente principal lê os arquivos ele mesmo: o resumo do subagente perde as nuances que atravessam os arquivos.</p>`,
     note:{lbl:"O que a doc acrescenta", html:`<strong>Mais motivos para não delegar.</strong> A doc manda ficar na conversa principal quando há muita ida e volta, quando várias fases compartilham bastante contexto, numa mudança rápida e pontual, ou quando a latência importa: um subagente comum começa do zero e precisa de tempo para reunir contexto.<br><strong>Fork.</strong> Um fork é um subagente que herda a conversa inteira, iniciado com <code>/subtask</code>. Não é preciso explicar a situação de novo, e as chamadas de ferramenta dele também ficam fora do contexto principal. Só o resultado volta.<br><strong><code>/btw</code>.</strong> Para uma pergunta sobre algo que já está na conversa, a doc indica o <code>/btw</code> em vez de um subagente. Ele vê o contexto todo, mas não usa ferramentas, e a resposta não entra no histórico.`},
-    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Boas práticas","https://code.claude.com/docs/en/best-practices"]] }
+    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Boas práticas","https://code.claude.com/docs/en/best-practices"]] },
+  { n:61, ch:9, here:true,
+    title:"Dê a cada subagente só as ferramentas que o papel dele pede",
+    orig:"Match subagent tool grants to role",
+    body:`<p>O campo <code>tools</code> no frontmatter de um subagente define o que ele pode fazer. Quanto mais estreito o escopo, menos surpresas. Os autores separam três perfis:</p>
+    <ul>
+      <li><strong>Revisores só de leitura</strong> (code-reviewer, security-auditor): <code>Read</code>, <code>Grep</code>, <code>Glob</code>. Mais nada.</li>
+      <li><strong>Pesquisadores</strong> (docs-fetcher, web-investigator): <code>Read</code>, <code>Grep</code>, <code>Glob</code>, <code>WebFetch</code>, <code>WebSearch</code>.</li>
+      <li><strong>Escritores</strong> (o construtor de uso geral): <code>Bash</code>, <code>Edit</code>, <code>Write</code>, mais as ferramentas de leitura.</li>
+    </ul>
+    <p>Um code-reviewer com <code>Bash</code> consegue executar coisas. Um docs-fetcher com <code>Edit</code> consegue reescrever seu código. Nenhum dos dois é o que você queria. O princípio é o mesmo das permissões de arquivo no POSIX: conceda o mínimo que deixa o agente fazer o trabalho, e nada além.</p>
+    <p>Escalone o modelo do mesmo jeito. Os autores usam Opus para raciocínio profundo (arquitetura, revisão de segurança), Sonnet para o código do dia a dia e Haiku para busca, classificação e consulta de dependências. Rodar a busca de rotina em Haiku já corta o custo de forma visível.</p>`,
+    note:{lbl:"O que a doc corrige", html:`<strong><code>CLAUDE_CODE_SUBAGENT_MODEL</code> não tem escopo por tarefa.</strong> O livro sugere usar <code>CLAUDE_CODE_SUBAGENT_MODEL=haiku</code> só para a carga de busca. Na verdade a variável é o modelo padrão de <em>todos</em> os subagentes. A ordem que o Claude Code segue é: o <code>model</code> passado na chamada; o <code>model</code> do frontmatter do subagente (<code>inherit</code> usa o da conversa principal); a variável; e, por fim, o modelo da conversa principal. Para pôr só a busca em Haiku, use <code>model: haiku</code> no frontmatter do subagente de busca. Para forçar um modelo em todos os subagentes, defina também <code>CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1</code>, e aí o <code>model</code> do frontmatter e o da chamada são ignorados.<br><strong>Allowlist ou denylist.</strong> O <code>tools</code> é uma allowlist. Sem ele, o subagente herda todas as ferramentas disponíveis para subagentes. Existe também o <code>disallowedTools</code>, uma denylist que tira ferramentas do conjunto herdado. Se os dois estiverem definidos, o <code>disallowedTools</code> é aplicado primeiro.`},
+    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"]] }
 ];
 
 /* ---------- render ---------- */
