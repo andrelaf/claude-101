@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 62</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 63</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;62<br>(capítulos 1 a 9)</p>
+      <p>Cobertura atual: dicas 1&ndash;63<br>(capítulos 1 a 9)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 62 de 101</b></span>
+        <span>Leitura: <b>dica 63 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 9</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -942,7 +942,7 @@ const TIPS = [
     <p>Escalone o modelo do mesmo jeito. Os autores usam Opus para raciocínio profundo (arquitetura, revisão de segurança), Sonnet para o código do dia a dia e Haiku para busca, classificação e consulta de dependências. Rodar a busca de rotina em Haiku já corta o custo de forma visível.</p>`,
     note:{lbl:"O que a doc corrige", html:`<strong><code>CLAUDE_CODE_SUBAGENT_MODEL</code> não tem escopo por tarefa.</strong> O livro sugere usar <code>CLAUDE_CODE_SUBAGENT_MODEL=haiku</code> só para a carga de busca. Na verdade a variável é o modelo padrão de <em>todos</em> os subagentes. A ordem que o Claude Code segue é: o <code>model</code> passado na chamada; o <code>model</code> do frontmatter do subagente (<code>inherit</code> usa o da conversa principal); a variável; e, por fim, o modelo da conversa principal. Para pôr só a busca em Haiku, use <code>model: haiku</code> no frontmatter do subagente de busca. Para forçar um modelo em todos os subagentes, defina também <code>CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1</code>, e aí o <code>model</code> do frontmatter e o da chamada são ignorados.<br><strong>Allowlist ou denylist.</strong> O <code>tools</code> é uma allowlist. Sem ele, o subagente herda todas as ferramentas disponíveis para subagentes. Existe também o <code>disallowedTools</code>, uma denylist que tira ferramentas do conjunto herdado. Se os dois estiverem definidos, o <code>disallowedTools</code> é aplicado primeiro.`},
     docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"]] },
-  { n:62, ch:9, here:true,
+  { n:62, ch:9,
     title:"<code>isolation: worktree</code> para subagentes que escrevem em paralelo",
     orig:"Use isolation: worktree for parallel-write subagents",
     body:`<p>Quando um subagente precisa mudar arquivos sem colidir com as mudanças da sessão principal, defina <code>isolation: worktree</code> no frontmatter dele. O Claude Code cria um git worktree temporário, o subagente trabalha lá dentro, e o worktree é limpo automaticamente quando o subagente termina <strong>sem ter feito mudanças</strong>.</p>
@@ -950,7 +950,16 @@ const TIPS = [
     <p>Para as suas próprias sessões paralelas, quando quiser conduzir várias janelas de agente lado a lado, os autores combinam isso com <code>claude --worktree</code>.</p>`,
     code:{lang:".claude/agents/refactor-attempt.md", text:`---\nname: refactor-attempt\ndescription: Tries one approach to refactoring src/auth/. Returns a summary of trade-offs.\nisolation: worktree\ntools: Read, Grep, Glob, Edit, Write, Bash\n---`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>O worktree parte do branch padrão, não do seu HEAD.</strong> Os worktrees de subagente usam a mesma base do <code>--worktree</code>, que é o branch padrão do repositório. O subagente não vê o trabalho em andamento da sessão principal, a menos que as settings tenham <code>"worktree": {"baseRef": "head"}</code>.<br><strong>Com mudanças, o worktree fica.</strong> Ele continua no disco, e o resultado do subagente informa o caminho e o branch. Uma varredura periódica remove esses worktrees quando ficam mais velhos que <code>cleanupPeriodDays</code>, sem perder trabalho. Enquanto o agente roda, o Claude Code trava o worktree com <code>git worktree lock</code>.<br><strong><code>claude --worktree</code></strong> (ou <code>-w</code>) cria o worktree em <code>.claude/worktrees/&lt;nome&gt;</code>. O nome é gerado se você não passar um. Também aceita <code>"#1234"</code> ou a URL de um PR para partir dele.`},
-    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Worktrees","https://code.claude.com/docs/en/worktrees"]] }
+    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Worktrees","https://code.claude.com/docs/en/worktrees"]] },
+  { n:63, ch:9, here:true,
+    title:"Executor e avaliador: para mudança sensível, quem revisa não viu a escrita",
+    orig:"Use the executor/evaluator pattern for sensitive changes",
+    body:`<p>Um subagente que escreve o código, avaliado por outro subagente que não viu o processo de escrita, pega coisas que um agente sozinho deixaria passar. Os autores usam isso sobretudo em código próximo de segurança: mudanças de autenticação, tratamento de pagamento, qualquer coisa que envolva entrada do usuário.</p>
+    <p>A linha que importa no fluxo abaixo é <strong>"passe só o diff"</strong>. O valor do revisor vem do contexto limpo. Se você entrega a ele a cadeia de raciocínio de quem escreveu, ele tende a concordar com ela. Se entrega só o diff, ele olha a mudança com olhos novos e desconfiados.</p>
+    <p>É o mesmo padrão escritor/revisor da <a href="#dica-39">dica 39</a>, mas mecanizado como delegação a subagente em vez de duas sessões manuais.</p>`,
+    code:{lang:"fluxo", text:`Agente principal: implemente a mudança no fluxo OAuth em src/auth/oauth.ts.\n[A implementação termina, os testes passam.]\nAgente principal: dispare um subagente code-reviewer novo. Passe a ele só o\ndiff (não o histórico da conversa). Peça: "Revise este diff quanto a\nsegurança, correção e aderência ao CLAUDE.md."\n[O subagente devolve a revisão.]\nAgente principal: aplique as correções da revisão.`},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>Não use um fork como revisor.</strong> O fork herda a conversa inteira, inclusive o raciocínio de quem escreveu, e isso desfaz o ponto da dica. O subagente comum começa só com o prompt que você passa: não recebe o histórico nem os resultados de ferramentas do agente principal.<br><strong>O CLAUDE.md chega sozinho.</strong> O subagente revisor carrega o CLAUDE.md do projeto, então pedir "aderência ao CLAUDE.md" funciona sem colar o arquivo no prompt.<br>A doc chama isso de <em>adversarial review step</em>: um modelo novo tenta refutar o resultado, para que quem fez o trabalho não seja quem dá a nota.`},
+    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Boas práticas","https://code.claude.com/docs/en/best-practices"]] }
 ];
 
 /* ---------- render ---------- */
