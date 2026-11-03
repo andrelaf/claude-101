@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 63</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 64</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;63<br>(capítulos 1 a 9)</p>
+      <p>Cobertura atual: dicas 1&ndash;64<br>(capítulos 1 a 9)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 63 de 101</b></span>
+        <span>Leitura: <b>dica 64 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 9</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -951,7 +951,7 @@ const TIPS = [
     code:{lang:".claude/agents/refactor-attempt.md", text:`---\nname: refactor-attempt\ndescription: Tries one approach to refactoring src/auth/. Returns a summary of trade-offs.\nisolation: worktree\ntools: Read, Grep, Glob, Edit, Write, Bash\n---`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>O worktree parte do branch padrão, não do seu HEAD.</strong> Os worktrees de subagente usam a mesma base do <code>--worktree</code>, que é o branch padrão do repositório. O subagente não vê o trabalho em andamento da sessão principal, a menos que as settings tenham <code>"worktree": {"baseRef": "head"}</code>.<br><strong>Com mudanças, o worktree fica.</strong> Ele continua no disco, e o resultado do subagente informa o caminho e o branch. Uma varredura periódica remove esses worktrees quando ficam mais velhos que <code>cleanupPeriodDays</code>, sem perder trabalho. Enquanto o agente roda, o Claude Code trava o worktree com <code>git worktree lock</code>.<br><strong><code>claude --worktree</code></strong> (ou <code>-w</code>) cria o worktree em <code>.claude/worktrees/&lt;nome&gt;</code>. O nome é gerado se você não passar um. Também aceita <code>"#1234"</code> ou a URL de um PR para partir dele.`},
     docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Worktrees","https://code.claude.com/docs/en/worktrees"]] },
-  { n:63, ch:9, here:true,
+  { n:63, ch:9,
     title:"Executor e avaliador: para mudança sensível, quem revisa não viu a escrita",
     orig:"Use the executor/evaluator pattern for sensitive changes",
     body:`<p>Um subagente que escreve o código, avaliado por outro subagente que não viu o processo de escrita, pega coisas que um agente sozinho deixaria passar. Os autores usam isso sobretudo em código próximo de segurança: mudanças de autenticação, tratamento de pagamento, qualquer coisa que envolva entrada do usuário.</p>
@@ -959,7 +959,19 @@ const TIPS = [
     <p>É o mesmo padrão escritor/revisor da <a href="#dica-39">dica 39</a>, mas mecanizado como delegação a subagente em vez de duas sessões manuais.</p>`,
     code:{lang:"fluxo", text:`Agente principal: implemente a mudança no fluxo OAuth em src/auth/oauth.ts.\n[A implementação termina, os testes passam.]\nAgente principal: dispare um subagente code-reviewer novo. Passe a ele só o\ndiff (não o histórico da conversa). Peça: "Revise este diff quanto a\nsegurança, correção e aderência ao CLAUDE.md."\n[O subagente devolve a revisão.]\nAgente principal: aplique as correções da revisão.`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>Não use um fork como revisor.</strong> O fork herda a conversa inteira, inclusive o raciocínio de quem escreveu, e isso desfaz o ponto da dica. O subagente comum começa só com o prompt que você passa: não recebe o histórico nem os resultados de ferramentas do agente principal.<br><strong>O CLAUDE.md chega sozinho.</strong> O subagente revisor carrega o CLAUDE.md do projeto, então pedir "aderência ao CLAUDE.md" funciona sem colar o arquivo no prompt.<br>A doc chama isso de <em>adversarial review step</em>: um modelo novo tenta refutar o resultado, para que quem fez o trabalho não seja quem dá a nota.`},
-    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Boas práticas","https://code.claude.com/docs/en/best-practices"]] }
+    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Boas práticas","https://code.claude.com/docs/en/best-practices"]] },
+  { n:64, ch:9, here:true,
+    title:"Subagente dentro de subagente: o limite existe, mas o desenho achatado continua sendo o melhor",
+    orig:"Subagents cannot spawn subagents, plan flat",
+    body:`<p>Existe um limite de profundidade para subagentes. Pela documentação atual, um subagente pode disparar subagentes próprios até três camadas abaixo da conversa principal. Na última camada, o Claude Code retira o <code>Agent</code> das ferramentas do subagente, e ele faz o trabalho delegado sozinho e devolve um resumo.</p>
+    <p>O conselho do livro continua valendo como desenho: quando a tarefa de um subagente parece pedir subagentes próprios, <strong>achate</strong>. O agente principal dispara o segundo subagente diretamente, quando o primeiro volta.</p>
+    <p>Para fluxos que parecem aninhados, a alternativa são as skills. Uma skill rodando no agente principal pode chamar o Agent tool quantas vezes quiser, em qualquer padrão, porque ela roda dentro da conversa principal e não conta como uma camada de subagente.</p>`,
+    code:[
+      {lang:"aninhado — o que o livro diz que falha", text:`Agente principal → subagente de pesquisa → [o subagente de pesquisa tenta\ndisparar um subagente parallel-fetcher para cada URL]`},
+      {lang:"achatado — o desenho recomendado", text:`Agente principal → subagente de pesquisa (devolve a lista de URLs)\n                 → subagente parallel-fetcher 1\n                 → subagente parallel-fetcher 2\n                 → subagente parallel-fetcher 3`}
+    ],
+    note:{lbl:"O que a doc corrige", html:`<strong>O limite não é de um nível.</strong> O livro diz que um subagente que chama o Agent tool falha. A doc atual diz que, por padrão, o aninhamento vai até três camadas abaixo da conversa principal. No limite, o <code>Agent</code> some da lista do subagente. Num fork ele continua listado, mas devolve erro em vez de disparar.<br><strong>O limite é configurável.</strong> A variável <code>CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH</code>, no bloco <code>env</code> do <code>settings.json</code>, define quantas camadas são permitidas. Com <code>"1"</code>, o aninhamento fica desligado e o comportamento é o que o livro descreve. Para impedir só um subagente de delegar, como um revisor que deve ficar só lendo, tire <code>Agent</code> do <code>tools</code> dele ou ponha em <code>disallowedTools</code>.<br><strong>Skill com <code>context: fork</code> é outra história.</strong> Ela roda num subagente, não na conversa principal, e entra na contagem de camadas.`},
+    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Skills","https://code.claude.com/docs/en/skills"]] }
 ];
 
 /* ---------- render ---------- */
