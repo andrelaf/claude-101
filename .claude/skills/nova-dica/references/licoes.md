@@ -58,6 +58,13 @@ de fato aconteceu, nunca preventivamente.
   foi manual. A `/publicar-dicas` exige essa revisão no passo 1, então a nota manual
   precisa estar escrita para o usuário poder aceitá-la ou recusá-la.
 
+- **`pdftotext -layout` engole as setas.** Na dica 64 os diagramas do livro vieram
+  como `Main agent  research subagent`, com espaço duplo no lugar de `→`. O mesmo
+  trecho extraído sem `-layout` e com `-enc UTF-8` (`pdftotext -f 58 -l 60 -enc UTF-8
+  livro.pdf -`) trouxe os bytes `e2 86 92`. Quando um bloco de código do `.txt` tiver
+  espaços duplos suspeitos entre termos, conferir a página sem layout antes de
+  escrever o `fonte.md`.
+
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS` no relatório
 final é candidata a virar entrada aqui. Sem essa revisão, a seção congela na versão um
