@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 65</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 66</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;65<br>(capítulos 1 a 9)</p>
+      <p>Cobertura atual: dicas 1&ndash;66<br>(capítulos 1 a 9)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 65 de 101</b></span>
+        <span>Leitura: <b>dica 66 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 9</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -972,7 +972,7 @@ const TIPS = [
     ],
     note:{lbl:"O que a doc corrige", html:`<strong>O limite não é de um nível.</strong> O livro diz que um subagente que chama o Agent tool falha. A doc atual diz que, por padrão, o aninhamento vai até três camadas abaixo da conversa principal. No limite, o <code>Agent</code> some da lista do subagente. Num fork ele continua listado, mas devolve erro em vez de disparar.<br><strong>O limite é configurável.</strong> A variável <code>CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH</code>, no bloco <code>env</code> do <code>settings.json</code>, define quantas camadas são permitidas. Com <code>"1"</code>, o aninhamento fica desligado e o comportamento é o que o livro descreve. Para impedir só um subagente de delegar, como um revisor que deve ficar só lendo, tire <code>Agent</code> do <code>tools</code> dele ou ponha em <code>disallowedTools</code>.<br><strong>Skill com <code>context: fork</code> é outra história.</strong> Ela roda num subagente, não na conversa principal, e entra na contagem de camadas.`},
     docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Skills","https://code.claude.com/docs/en/skills"]] },
-  { n:65, ch:9, here:true,
+  { n:65, ch:9,
     title:"Depois do resumo do Explore, o agente principal lê os arquivos de verdade",
     orig:"After Explore returns a summary, have the main agent read the actual files",
     body:`<p>O subagente embutido Explore é ótimo para buscar no código depressa e sem mexer em nada. Ele volta rápido e entrega um resumo útil de onde as coisas estão e de como se ligam.</p>
@@ -980,7 +980,15 @@ const TIPS = [
     <p>O passo do Explore economiza o tempo de pesquisa. As leituras do agente principal protegem a atenção que atravessa os arquivos. <strong>As duas são necessárias, e nenhuma basta sozinha.</strong></p>`,
     code:{lang:"fluxo", text:`1. Dispare um subagente Explore: "Ache todas as chamadas de \`validateUser\`\n   e resuma o contexto de cada uma."\n2. Leia o resumo no agente principal.\n3. Para cada chamada listada, o agente principal lê o arquivo de verdade\n   antes de mudar qualquer coisa.\n4. O agente principal faz o refactor com todas as chamadas na atenção.`},
     note:{lbl:"O que a doc corrige", html:`<strong>O Explore não roda em Haiku.</strong> O livro diz que sim. Pela doc atual, ele usa o modelo da conversa principal. Quando a principal roda Fable, o Explore vai para o Opus com assinatura, Console ou gateway, e fica no modelo da principal no Bedrock, na Agent Platform e no Foundry. Para explorar num modelo mais barato, crie um subagente de usuário ou de projeto chamado <code>Explore</code> com <code>model: haiku</code>: ele substitui o embutido.<br><strong>Ele tem três níveis de minúcia.</strong> Ao chamar o Explore, o Claude escolhe entre <em>quick</em>, para uma busca pontual, <em>medium</em> e <em>very thorough</em>, para uma análise completa. Para listar todas as chamadas antes de um refactor, peça o <em>very thorough</em>: uma chamada que fica fora do resumo também fica fora do passo 3.<br><strong>Par com a <a href="#dica-60">dica 60</a>.</strong> Lá, o refactor que atravessa arquivos aparece como o caso em que não se delega. Aqui está o meio-termo: delegar a busca e trazer a leitura de volta para o agente principal.`},
-    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"]] }
+    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"]] },
+  { n:66, ch:9, here:true,
+    title:"Limite de 2 a 4 sessões paralelas por desenvolvedor: o gargalo é você, não o agente",
+    orig:"Cap parallel sessions at 2 to 4 per developer",
+    body:`<p>Existe um teto técnico para agentes em paralelo (veja a nota), mas não é ele que segura o trabalho. Na prática, segundo a experiência dos autores, o limite útil é de <strong>2 a 4 sessões paralelas por desenvolvedor</strong>.</p>
+    <p>Acima de 4, o gargalo não é o agente: é você. Revisar quatro diffs em paralelo é difícil. Manter quatro modelos mentais de "o que essa branch está fazendo" é mais difícil ainda. E coordenar quatro agentes que acham que são donos de <code>src/auth/</code> termina em inferno de merge.</p>
+    <p>Duas sessões bem conduzidas rendem mais, no total, do que seis caóticas. A exceção é rodar a mesma tarefa com prompts levemente diferentes, esperando que uma delas dê o melhor resultado: aí 5 a 10 tentativas paralelas podem valer o custo em tokens. Mas esse é outro modo de trabalho, e merece ser tratado como tal: <strong>exploração paralela curta para escolher a melhor de N, não trabalho paralelo sustentado.</strong></p>`,
+    note:{lbl:"O que a doc corrige", html:`<strong>O teto não é mais 10.</strong> O livro fala em um limite documentado de 10 agentes paralelos por chamada de ferramenta. Hoje, por padrão, quando há 20 subagentes rodando numa sessão, a ferramenta Agent recusa o próximo com <code>Concurrent subagent limit reached</code>. O número muda com <code>CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS</code> (v2.1.217+), que ajusta o limite mas não o desliga; sessões com ultracode ficam isentas.<br><strong>A doc chega a uma conclusão parecida para agent teams.</strong> Ela recomenda começar com 3 a 5 teammates e diz que três focados costumam render mais que cinco dispersos, porque o custo em tokens cresce com cada um e a coordenação também.`},
+    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Agent teams","https://code.claude.com/docs/en/agent-teams"]] }
 ];
 
 /* ---------- render ---------- */
