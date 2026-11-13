@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 67</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 68</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;67<br>(capítulos 1 a 10)</p>
+      <p>Cobertura atual: dicas 1&ndash;68<br>(capítulos 1 a 10)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 67 de 101</b></span>
+        <span>Leitura: <b>dica 68 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 10</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -991,7 +991,7 @@ const TIPS = [
     <p>Duas sessões bem conduzidas rendem mais, no total, do que seis caóticas. A exceção é rodar a mesma tarefa com prompts levemente diferentes, esperando que uma delas dê o melhor resultado: aí 5 a 10 tentativas paralelas podem valer o custo em tokens. Mas esse é outro modo de trabalho, e merece ser tratado como tal: <strong>exploração paralela curta para escolher a melhor de N, não trabalho paralelo sustentado.</strong></p>`,
     note:{lbl:"O que a doc corrige", html:`<strong>O teto não é mais 10.</strong> O livro fala em um limite documentado de 10 agentes paralelos por chamada de ferramenta. Hoje, por padrão, quando há 20 subagentes rodando numa sessão, a ferramenta Agent recusa o próximo com <code>Concurrent subagent limit reached</code>. O número muda com <code>CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS</code> (v2.1.217+), que ajusta o limite mas não o desliga; sessões com ultracode ficam isentas.<br><strong>A doc chega a uma conclusão parecida para agent teams.</strong> Ela recomenda começar com 3 a 5 teammates e diz que três focados costumam render mais que cinco dispersos, porque o custo em tokens cresce com cada um e a coordenação também.`},
     docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Agent teams","https://code.claude.com/docs/en/agent-teams"]] },
-  { n:67, ch:10, here:true,
+  { n:67, ch:10,
     title:"O rótulo do botão é a trava: nunca clicar em \"Send Now\" ou \"Publish\"",
     orig:"The button label is the safety check, never click \"Send Now\" or \"Publish\"",
     body:`<p>Esta é a regra que os autores nunca afrouxam: um fluxo de automação de navegador não clica em nenhum botão cujo rótulo seja "Send Now", "Publish", "Post Now" ou equivalente. Só são permitidos "Schedule", "Save Draft", "Preview" e outros rótulos que não causam estrago.</p>
@@ -999,7 +999,16 @@ const TIPS = [
     <p>Quando o destino exige uma data futura (um campo de agendamento), entra uma segunda checagem: antes do clique, validar a data lida contra a hora local atual. <strong>Se ela não estiver no futuro, parar e avisar o usuário.</strong></p>`,
     code:{lang:"SKILL.md", text:"Only click the button if it says `Schedule`. NEVER click if the button\nsays `Publish`, `Post Now`, or `Send Now`."},
     note:{lbl:"O que a doc acrescenta", html:`<strong>As proteções embutidas não substituem essa regra.</strong> No Claude in Chrome e no navegador do app desktop, cada site precisa de permissão própria (Allow once, Always allow ou Deny), e classificadores de segurança revisam cliques e digitação em páginas externas em qualquer modo de permissão. A doc também diz que o Claude não compra, não cria contas e não contorna CAPTCHA sem a sua confirmação. Mas publicar ou enviar não estão nessa lista. Por isso a trava pelo rótulo continua sendo trabalho de quem escreve a skill.`},
-    docs:[["Claude in Chrome","https://code.claude.com/docs/en/chrome"]] }
+    docs:[["Claude in Chrome","https://code.claude.com/docs/en/chrome"]] },
+  { n:68, ch:10, here:true,
+    title:"Fixe o viewport antes da primeira captura",
+    orig:"Set a fixed viewport before the first capture",
+    body:`<p>Screenshots tirados com tamanhos de viewport diferentes quebram as comparações visuais e confundem o raciocínio espacial do agente. A correção é <strong>fixar o viewport antes da primeira captura</strong> de qualquer sessão e nunca mais mudá-lo.</p>
+    <p>Os autores usam 1440 por 900 como padrão, porque esse tamanho pega a maioria dos layouts de desktop sem o corte que acontece em larguras menores. Com o viewport fixo, todo screenshot da sessão usa o mesmo sistema de coordenadas.</p>
+    <p>Um diagnóstico relacionado: se um screenshot novo tem exatamente o mesmo tamanho em bytes de um recente, desconfie de uma captura velha. Às vezes o navegador devolve um frame em cache. A conferência é ler o arquivo do screenshot de volta e confirmar que o conteúdo bate com o que deveria estar na tela.</p>`,
+    code:{lang:"SKILL.md", text:"Before the first screenshot, call `resize_page` to a stable viewport\n(e.g. 1440x900). Do not change the viewport during the run."},
+    note:{lbl:"O que a doc acrescenta", html:`<strong><code>resize_page</code> é nome do Chrome DevTools MCP.</strong> Lá ela recebe <code>pageId</code>, <code>width</code> e <code>height</code>. O livro não diz qual servidor usa, e outro servidor de navegador pode dar outro nome a essa ação. No Claude in Chrome, a lista de ferramentas aparece em <code>/mcp</code> → <code>claude-in-chrome</code> → <strong>View tools</strong>.<br><strong>O <code>take_screenshot</code> do mesmo servidor captura só o viewport visível</strong>, a menos que se passe <code>fullPage: true</code>. Com <code>filePath</code>, ele salva a imagem em disco, o que facilita a checagem de bytes do último parágrafo.`},
+    docs:[["Claude in Chrome","https://code.claude.com/docs/en/chrome"],["Chrome DevTools MCP: ferramentas","https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md"]] }
 ];
 
 /* ---------- render ---------- */
