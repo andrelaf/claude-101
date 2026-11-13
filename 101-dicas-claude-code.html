@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 66</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 67</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;66<br>(capítulos 1 a 9)</p>
+      <p>Cobertura atual: dicas 1&ndash;67<br>(capítulos 1 a 10)</p>
     </div>
   </aside>
 
@@ -253,8 +253,8 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 66 de 101</b></span>
-        <span>Capítulos cobertos: <b>1 a 9</b></span>
+        <span>Leitura: <b>dica 67 de 101</b></span>
+        <span>Capítulos cobertos: <b>1 a 10</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
     </header>
@@ -287,7 +287,9 @@ const CHAPTERS = [
   { n: 8, title: "Servidores MCP e ferramentas externas",
     note: "O MCP é como o Claude Code se conecta a sistemas externos: GitHub, Trello, Google Sheets, automação de navegador e dezenas de integrações de fornecedores. É também onde mora boa parte do inchaço de contexto, porque cada servidor ativo ocupa espaço antes de qualquer trabalho começar. Este capítulo reúne os padrões para manter as integrações úteis sem deixar que dominem o orçamento de contexto." },
   { n: 9, title: "Subagentes e trabalho em paralelo",
-    note: "Subagentes são o jeito de o Claude Code delegar trabalho. O agente principal dispara um subagente com a ferramenta Agent. O subagente roda numa janela de contexto própria, com ferramentas e modelo próprios, e devolve só o resultado: nada do trabalho intermediário entra no contexto principal. Bem usados, eles mantêm a conversa principal limpa durante pesquisa pesada ou trabalho em paralelo. Mal usados, queimam tokens em tarefas que não precisavam de paralelismo. Este capítulo trata da linha entre os dois casos." }
+    note: "Subagentes são o jeito de o Claude Code delegar trabalho. O agente principal dispara um subagente com a ferramenta Agent. O subagente roda numa janela de contexto própria, com ferramentas e modelo próprios, e devolve só o resultado: nada do trabalho intermediário entra no contexto principal. Bem usados, eles mantêm a conversa principal limpa durante pesquisa pesada ou trabalho em paralelo. Mal usados, queimam tokens em tarefas que não precisavam de paralelismo. Este capítulo trata da linha entre os dois casos." },
+  { n: 10, title: "Cuidados com automação de navegador",
+    note: "Automação de navegador é uma das coisas mais poderosas que o Claude Code pode conduzir, e uma das que mais falham. Páginas mudam, seletores se desatualizam, interfaces de fornecedor repetem o mesmo id em dois lugares e eventos sintéticos às vezes disparam e às vezes não. A distância entre clicar no botão certo e clicar no errado é pequena, por isso estes padrões tratam qualquer fluxo que clica numa página com consequências para pessoas reais com disciplina redobrada." }
 ];
 
 const TIPS = [
@@ -981,14 +983,23 @@ const TIPS = [
     code:{lang:"fluxo", text:`1. Dispare um subagente Explore: "Ache todas as chamadas de \`validateUser\`\n   e resuma o contexto de cada uma."\n2. Leia o resumo no agente principal.\n3. Para cada chamada listada, o agente principal lê o arquivo de verdade\n   antes de mudar qualquer coisa.\n4. O agente principal faz o refactor com todas as chamadas na atenção.`},
     note:{lbl:"O que a doc corrige", html:`<strong>O Explore não roda em Haiku.</strong> O livro diz que sim. Pela doc atual, ele usa o modelo da conversa principal. Quando a principal roda Fable, o Explore vai para o Opus com assinatura, Console ou gateway, e fica no modelo da principal no Bedrock, na Agent Platform e no Foundry. Para explorar num modelo mais barato, crie um subagente de usuário ou de projeto chamado <code>Explore</code> com <code>model: haiku</code>: ele substitui o embutido.<br><strong>Ele tem três níveis de minúcia.</strong> Ao chamar o Explore, o Claude escolhe entre <em>quick</em>, para uma busca pontual, <em>medium</em> e <em>very thorough</em>, para uma análise completa. Para listar todas as chamadas antes de um refactor, peça o <em>very thorough</em>: uma chamada que fica fora do resumo também fica fora do passo 3.<br><strong>Par com a <a href="#dica-60">dica 60</a>.</strong> Lá, o refactor que atravessa arquivos aparece como o caso em que não se delega. Aqui está o meio-termo: delegar a busca e trazer a leitura de volta para o agente principal.`},
     docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"]] },
-  { n:66, ch:9, here:true,
+  { n:66, ch:9,
     title:"Limite de 2 a 4 sessões paralelas por desenvolvedor: o gargalo é você, não o agente",
     orig:"Cap parallel sessions at 2 to 4 per developer",
     body:`<p>Existe um teto técnico para agentes em paralelo (veja a nota), mas não é ele que segura o trabalho. Na prática, segundo a experiência dos autores, o limite útil é de <strong>2 a 4 sessões paralelas por desenvolvedor</strong>.</p>
     <p>Acima de 4, o gargalo não é o agente: é você. Revisar quatro diffs em paralelo é difícil. Manter quatro modelos mentais de "o que essa branch está fazendo" é mais difícil ainda. E coordenar quatro agentes que acham que são donos de <code>src/auth/</code> termina em inferno de merge.</p>
     <p>Duas sessões bem conduzidas rendem mais, no total, do que seis caóticas. A exceção é rodar a mesma tarefa com prompts levemente diferentes, esperando que uma delas dê o melhor resultado: aí 5 a 10 tentativas paralelas podem valer o custo em tokens. Mas esse é outro modo de trabalho, e merece ser tratado como tal: <strong>exploração paralela curta para escolher a melhor de N, não trabalho paralelo sustentado.</strong></p>`,
     note:{lbl:"O que a doc corrige", html:`<strong>O teto não é mais 10.</strong> O livro fala em um limite documentado de 10 agentes paralelos por chamada de ferramenta. Hoje, por padrão, quando há 20 subagentes rodando numa sessão, a ferramenta Agent recusa o próximo com <code>Concurrent subagent limit reached</code>. O número muda com <code>CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS</code> (v2.1.217+), que ajusta o limite mas não o desliga; sessões com ultracode ficam isentas.<br><strong>A doc chega a uma conclusão parecida para agent teams.</strong> Ela recomenda começar com 3 a 5 teammates e diz que três focados costumam render mais que cinco dispersos, porque o custo em tokens cresce com cada um e a coordenação também.`},
-    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Agent teams","https://code.claude.com/docs/en/agent-teams"]] }
+    docs:[["Subagentes","https://code.claude.com/docs/en/sub-agents"],["Agent teams","https://code.claude.com/docs/en/agent-teams"]] },
+  { n:67, ch:10, here:true,
+    title:"O rótulo do botão é a trava: nunca clicar em \"Send Now\" ou \"Publish\"",
+    orig:"The button label is the safety check, never click \"Send Now\" or \"Publish\"",
+    body:`<p>Esta é a regra que os autores nunca afrouxam: um fluxo de automação de navegador não clica em nenhum botão cujo rótulo seja "Send Now", "Publish", "Post Now" ou equivalente. Só são permitidos "Schedule", "Save Draft", "Preview" e outros rótulos que não causam estrago.</p>
+    <p>O motivo é simples. Dá para escrever toda a validação de horário de agendamento que se quiser, mas basta um bug de um caractere ("para o agente, Send Now parecia igual a Schedule") para algo que ninguém aprovou chegar aos clientes. Tratar o <strong>texto literal do botão como restrição rígida</strong> elimina esse risco.</p>
+    <p>Quando o destino exige uma data futura (um campo de agendamento), entra uma segunda checagem: antes do clique, validar a data lida contra a hora local atual. <strong>Se ela não estiver no futuro, parar e avisar o usuário.</strong></p>`,
+    code:{lang:"SKILL.md", text:"Only click the button if it says `Schedule`. NEVER click if the button\nsays `Publish`, `Post Now`, or `Send Now`."},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>As proteções embutidas não substituem essa regra.</strong> No Claude in Chrome e no navegador do app desktop, cada site precisa de permissão própria (Allow once, Always allow ou Deny), e classificadores de segurança revisam cliques e digitação em páginas externas em qualquer modo de permissão. A doc também diz que o Claude não compra, não cria contas e não contorna CAPTCHA sem a sua confirmação. Mas publicar ou enviar não estão nessa lista. Por isso a trava pelo rótulo continua sendo trabalho de quem escreve a skill.`},
+    docs:[["Claude in Chrome","https://code.claude.com/docs/en/chrome"]] }
 ];
 
 /* ---------- render ---------- */
