@@ -65,6 +65,14 @@ de fato aconteceu, nunca preventivamente.
   espaços duplos suspeitos entre termos, conferir a página sem layout antes de
   escrever o `fonte.md`.
 
+- **Pedir o capítulo novo em branco não funcionou.** Na dica 67 (capítulo 10) a skill
+  parou pedindo título e nota, sem proposta, e a resposta veio como "aprovado" — não
+  havia nada para aprovar. O que destravou foi oferecer um rascunho tirado só da
+  abertura do capítulo no livro, com três saídas: aprovar, ajustar ou escrever do zero.
+  Quando o usuário aprova o rascunho, registrar no `pedido.md` que a escrita foi do
+  Claude e a aprovação foi do usuário, com a frase literal. O último objeto de
+  `CHAPTERS` não tem vírgula final: acrescentar a vírgula ao inserir o capítulo novo.
+
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS` no relatório
 final é candidata a virar entrada aqui. Sem essa revisão, a seção congela na versão um
