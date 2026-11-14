@@ -111,6 +111,12 @@ Primeira execução em 2026-09-22, publicando as dicas 31 e 32.
   o push no turno seguinte. A frase do Workflow é a de publicar, e o push muda estado
   externo, então não pode ser inferido de uma resposta que não fala dele. O relatório
   diz que `main` ficou à frente de `origin/main` e pergunta de novo, numa linha.
+- **…mas responde ao push quando ele é a única pergunta aberta.** Na dica 68 o
+  relatório perguntou só "Posso fazer o push?", com commit e republicação já feitos, e
+  a resposta veio como "pode publicar". Não restava outra coisa a que a frase pudesse
+  se referir, então ela foi tomada como aprovação do push, e isso foi dito em voz alta
+  antes de rodar. A regra de cima vale para a pergunta do passo 3, que junta publicar
+  e subir; aqui o que conta é a pergunta que estava aberta.
 
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS MANUAIS` no
