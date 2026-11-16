@@ -89,18 +89,35 @@ Consultar a documentação via Context7, não de memória.
 
 ## Portão B: Aprovação do texto
 
-**STOP no portão B.** Antes de tocar no HTML, mostrar ao usuário, no chat:
+**Portão B automático ou com STOP.** Decidido pelo usuário em 2026-11-14: o portão só
+para quando há risco. Ele abre sozinho quando valem **as três** condições:
+
+1. o `verificacao.md` não registra divergência entre livro e documentação;
+2. o objeto não tem `note`, nem nenhuma frase, exemplo ou link que não esteja no
+   livro (inferência do Claude conta como fora do livro);
+3. a dica não abre capítulo novo.
+
+Aberto sozinho, o portão grava o `aprovacao.md` com a linha
+`Aprovação automática (critério do usuário, 2026-11-14): sem divergência, sem
+conteúdo fora do livro, sem capítulo novo.` no lugar da frase do usuário, seguida do
+bloco `## Approved YYYY-MM-DD` de sempre. O objeto completo vai no relatório final,
+para o usuário poder ler o que entrou.
+
+**Em qualquer outro caso, STOP no portão B.** Antes de tocar no HTML, mostrar ao
+usuário, no chat:
 
 - o `title` em português e o `orig` em inglês
 - o `body` redigido
 - o `code`, se houver, com o rótulo `lang` de cada bloco
 - a `note`, quando a fase 2 tiver encontrado divergência entre livro e documentação
+- o que está fora do livro, apontado um a um
 
-Esperar aprovação explícita antes de seguir para a fase 3.
+Esperar aprovação explícita antes de seguir para a fase 3. Na dúvida sobre qualquer
+das três condições, parar: o critério automático vale só quando as três são óbvias.
 
-Não prosseguir sem aprovação, não importa quão limpo o texto pareça. Fase 2 sem
-divergências não é aprovação. Silêncio não é aprovação. Fase 4 existir depois não é
-desculpa para pular o portão agora. Só a palavra do usuário abre o portão.
+Fora do caso automático, não prosseguir sem aprovação, não importa quão limpo o texto
+pareça. Silêncio não é aprovação. Fase 4 existir depois não é desculpa para pular o
+portão agora. Só a palavra do usuário abre o portão.
 
 **Entradas:** o objeto redigido a partir de `fonte.md` e `verificacao.md`.
 **Saídas:** `<job>/aprovacao.md`, contendo a frase de aprovação do usuário

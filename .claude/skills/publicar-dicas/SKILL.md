@@ -37,12 +37,16 @@ o que não está na lista continua possível, só volta a perguntar.
 2. **Ler o bloco de estado acima.** Se o branch não for `main`, parar e perguntar.
    Se houver arquivo alterado que não seja a página ou uma skill, parar e perguntar.
 3. **Confirmar com o usuário.** Mostrar a mensagem de commit proposta e esperar um
-   "pode publicar" explícito.
+   "pode publicar" explícito. Desde 2026-11-14, por decisão do usuário, "pode
+   publicar" cobre também o push para `origin/main`: não perguntar o push à parte.
 4. **Commitar.** Formato `dicas: adiciona dica NN (<título curto>)`. Adicionar os
    arquivos por nome; nunca `git add -A`.
 5. **Republicar o artifact.** Mesmo caminho de arquivo, mesma URL. Nunca criar um
    artifact novo para a mesma página.
-6. **Reportar.** Devolver o SHA do commit e a URL publicada.
+6. **Subir.** `git push origin main`. Antes, conferir que o PDF não está em nenhum
+   commit a subir (`git diff --stat origin/main..main`).
+7. **Reportar.** Devolver o SHA do commit, a URL publicada e o estado de `main` em
+   relação a `origin/main`.
 
 ## Rules
 
@@ -117,6 +121,9 @@ Primeira execução em 2026-09-22, publicando as dicas 31 e 32.
   se referir, então ela foi tomada como aprovação do push, e isso foi dito em voz alta
   antes de rodar. A regra de cima vale para a pergunta do passo 3, que junta publicar
   e subir; aqui o que conta é a pergunta que estava aberta.
+- **As duas entradas acima foram superadas em 2026-11-14.** O usuário pediu menos
+  paradas no loop e escolheu que "pode publicar" cubra o push. O passo 3 e o novo
+  passo 6 registram isso. As entradas ficam como histórico do porquê.
 
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS MANUAIS` no
