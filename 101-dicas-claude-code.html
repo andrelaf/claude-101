@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 69</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 70</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;69<br>(capítulos 1 a 10)</p>
+      <p>Cobertura atual: dicas 1&ndash;70<br>(capítulos 1 a 10)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 69 de 101</b></span>
+        <span>Leitura: <b>dica 70 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 10</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -1009,7 +1009,7 @@ const TIPS = [
     code:{lang:"SKILL.md", text:"Before the first screenshot, call `resize_page` to a stable viewport\n(e.g. 1440x900). Do not change the viewport during the run."},
     note:{lbl:"O que a doc acrescenta", html:`<strong><code>resize_page</code> é nome do Chrome DevTools MCP.</strong> Lá ela recebe <code>pageId</code>, <code>width</code> e <code>height</code>. O livro não diz qual servidor usa, e outro servidor de navegador pode dar outro nome a essa ação. No Claude in Chrome, a lista de ferramentas aparece em <code>/mcp</code> → <code>claude-in-chrome</code> → <strong>View tools</strong>.<br><strong>O <code>take_screenshot</code> do mesmo servidor captura só o viewport visível</strong>, a menos que se passe <code>fullPage: true</code>. Com <code>filePath</code>, ele salva a imagem em disco, o que facilita a checagem de bytes do último parágrafo.`},
     docs:[["Claude in Chrome","https://code.claude.com/docs/en/chrome"],["Chrome DevTools MCP: ferramentas","https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md"]] },
-  { n:69, ch:10, here:true,
+  { n:69, ch:10,
     title:"Depois de navegar, espere um elemento estável e só então capture",
     orig:"Wait for a stable element after navigation, then capture",
     body:`<p>Os servidores MCP de navegador têm uma ação <code>wait_for</code> que pausa até algo aparecer na página. No Chrome DevTools MCP, esse algo é um <strong>texto</strong> (veja a nota). Os autores usam essa espera <strong>depois de toda navegação</strong>, não como plano B quando algo falha.</p>
@@ -1020,7 +1020,14 @@ const TIPS = [
       {lang:"SKILL.md", text:`If the screenshot shows a loading spinner, wait 2 seconds and retry.\nCap at 2 retries per frame to avoid infinite loops.`}
     ],
     note:{lbl:"O que a doc corrige", html:`<strong>No Chrome DevTools MCP, o <code>wait_for</code> não recebe seletor CSS.</strong> Ele espera um <strong>texto</strong>: o parâmetro <code>text</code> é uma lista, e a espera termina quando algum valor bate exatamente com um nome acessível ou aparece no texto do DOM, diferenciando maiúsculas. O passo 2 do livro, <code>wait_for selector: ...</code>, não existe nesse servidor. O equivalente é esperar um texto que só aparece quando o formulário carregou, com <code>visible: true</code>, porque por padrão texto oculto também conta.<br><strong>A espera tem teto próprio.</strong> <code>wait_for</code> e <code>navigate_page</code> aceitam <code>timeout</code> em milissegundos, o que dá a cada chamada o mesmo "falhar rápido" que o livro pede para as novas tentativas.`},
-    docs:[["Chrome DevTools MCP: ferramentas","https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md"]] }
+    docs:[["Chrome DevTools MCP: ferramentas","https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md"]] },
+  { n:70, ch:10, here:true,
+    title:"Página de fornecedor com ids duplicados: restrinja todo seletor ao container ativo",
+    orig:"When a vendor page has duplicate ids, scope every selector to the active container",
+    body:`<p>Este é um dos bugs mais caros que um fluxo de automação de navegador pode encontrar. A página do fornecedor tem uma barra de abas, e o painel de cada aba reaproveita os mesmos <code>id="time_hour"</code> e <code>id="time_minute"</code>. Sem restringir o escopo, <code>document.getElementById("time_hour")</code> devolve o primeiro na ordem do DOM, que é o do painel inativo. Os valores são preenchidos, o "Schedule" é clicado, e nada acontece: os valores foram parar num painel que o usuário nem está vendo.</p>
+    <p>A correção é <strong>restringir todo seletor ao container ativo</strong>. Os autores documentam o padrão de seletor no SKILL.md, para o Claude não ter de deduzi-lo.</p>
+    <p>E acrescentam uma checagem de sanidade: antes de cada interação, consultar de novo o elemento que diz "esta aba continua selecionada". <strong>Se ele voltar nulo, parar e avisar o usuário</strong>, em vez de chutar.</p>`,
+    code:{lang:"SKILL.md", text:`The page has duplicate \`time_hour\` / \`time_minute\` ids across panels.\nUse the composer-specific ones, scoped to the visible (\`aria-hidden="false"\`) panel:\n\ndocument.querySelector('[role="tabpanel"]:not([aria-hidden="true"]) #time_hour')`} }
 ];
 
 /* ---------- render ---------- */
