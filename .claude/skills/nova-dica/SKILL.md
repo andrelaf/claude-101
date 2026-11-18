@@ -1,7 +1,7 @@
 ---
 name: nova-dica
-description: This skill should be used when the user finishes reading a tip from the 101 Claude Code Tips book and asks to add it to the study page. Runs a five-phase pipeline that ends with one new entry in the TIPS array. For the study page only, never for other HTML files.
-allowed-tools: Bash(grep *), Bash(ls *), Bash(mkdir *), Bash(cat *), Bash(date *)
+description: This skill should be used when the user finishes reading a tip from the 101 Claude Code Tips book and asks to add it to the study page. Runs a six-phase pipeline that ends with one new entry in the TIPS array, committed, republished and pushed. For the study page only, never for other HTML files.
+allowed-tools: Bash(grep *), Bash(ls *), Bash(mkdir *), Bash(cat *), Bash(date *), Bash(git add 101-dicas-claude-code.html), Bash(git commit *), Bash(git fetch *), Bash(git diff *), Bash(git push origin main)
 ---
 
 # Nova dica na página
@@ -27,8 +27,14 @@ Acrescentar uma dica do livro à página de estudo: um objeto novo no array `TIP
 o marcador de posição atual movido, e os contadores do cabeçalho atualizados.
 A dica entra em português, com o título original em inglês preservado.
 
-Não usar esta skill para reescrever dicas já publicadas, para mudar o design da
-página, nem para publicar. Publicar é `/publicar-dicas`.
+Desde 2026-11-18, por decisão do usuário, **invocar `/nova-dica NN` é a única
+aprovação do fluxo**: a skill vai da extração até o push sem parar, e o usuário pede
+ajustes depois de publicado. As únicas paradas que restam são o portão A (execução
+anterior da mesma dica) e um capítulo novo, porque os dois precisam de uma decisão ou de
+um texto que só o usuário tem.
+
+Não usar esta skill para reescrever dicas já publicadas nem para mudar o design da
+página. Republicar sem dica nova continua sendo `/publicar-dicas`.
 
 ## Portão A: Reset ou Resume
 
@@ -89,35 +95,22 @@ Consultar a documentação via Context7, não de memória.
 
 ## Portão B: Aprovação do texto
 
-**Portão B automático ou com STOP.** Decidido pelo usuário em 2026-11-14: o portão só
-para quando há risco. Ele abre sozinho quando valem **as três** condições:
+**Portão B automático.** Decidido pelo usuário em 2026-11-18 ("só dá o ok uma vez. se
+precisar de ajuste peço depois de publicado"): o portão não para mais por divergência
+nem por conteúdo fora do livro. A invocação da skill é a aprovação. Ele só para quando
+a dica abre capítulo novo (ver Rules).
 
-1. o `verificacao.md` não registra divergência entre livro e documentação;
-2. o objeto não tem `note`, nem nenhuma frase, exemplo ou link que não esteja no
-   livro (inferência do Claude conta como fora do livro);
-3. a dica não abre capítulo novo.
+O portão grava o `aprovacao.md` com a linha
+`Aprovação automática (critério do usuário, 2026-11-18): a invocação de /nova-dica é a
+aprovação; ajustes são pedidos depois de publicado.` no lugar da frase do usuário. Logo
+abaixo vem uma seção `### Para revisar`, que lista as divergências do `verificacao.md` e
+tudo o que está fora do livro, um item por linha (`note`, links de `docs`, inferências,
+negritos que o livro não tem). Sem nada a listar, a seção diz "nada". Depois vem o bloco
+`## Approved YYYY-MM-DD` de sempre.
 
-Aberto sozinho, o portão grava o `aprovacao.md` com a linha
-`Aprovação automática (critério do usuário, 2026-11-14): sem divergência, sem
-conteúdo fora do livro, sem capítulo novo.` no lugar da frase do usuário, seguida do
-bloco `## Approved YYYY-MM-DD` de sempre. O objeto completo vai no relatório final,
-para o usuário poder ler o que entrou.
-
-**Em qualquer outro caso, STOP no portão B.** Antes de tocar no HTML, mostrar ao
-usuário, no chat:
-
-- o `title` em português e o `orig` em inglês
-- o `body` redigido
-- o `code`, se houver, com o rótulo `lang` de cada bloco
-- a `note`, quando a fase 2 tiver encontrado divergência entre livro e documentação
-- o que está fora do livro, apontado um a um
-
-Esperar aprovação explícita antes de seguir para a fase 3. Na dúvida sobre qualquer
-das três condições, parar: o critério automático vale só quando as três são óbvias.
-
-Fora do caso automático, não prosseguir sem aprovação, não importa quão limpo o texto
-pareça. Silêncio não é aprovação. Fase 4 existir depois não é desculpa para pular o
-portão agora. Só a palavra do usuário abre o portão.
+O portão continua existindo mesmo sem parar: ele é o ponto em que o texto fica decidido,
+e a seção `Para revisar` é o que o usuário lê depois. Ela vai inteira para o relatório
+final, junto com o objeto completo.
 
 **Entradas:** o objeto redigido a partir de `fonte.md` e `verificacao.md`.
 **Saídas:** `<job>/aprovacao.md`, contendo a frase de aprovação do usuário
@@ -158,12 +151,39 @@ e o veredito ecoado no bloco final.
 **Pular se:** nunca. A verificação roda toda vez, mesmo em retomada: ela é barata, e é
 ela que detecta o estrago de uma execução anterior interrompida.
 
+## Fase 5: Publicar
+
+**Entradas:** `<job>/revisao.txt` com veredito "pronto para publicar". Com qualquer
+outro veredito, a fase 5 não começa: parar e reportar o que a revisão achou. Página
+quebrada no ar custa mais que uma parada.
+**Saídas:** `<job>/publicacao.txt` com o SHA do commit, a versão do artifact e a linha
+do `git status -sb` depois do push.
+**Pular se:** `<job>/publicacao.txt` já existe e não está vazio.
+
+Os passos seguem o Workflow da `/publicar-dicas`, que não pode ser chamada daqui por
+ter `disable-model-invocation: true`:
+
+1. `git status --short`. Se houver arquivo alterado que não seja a página, um arquivo
+   de skill ou `output/`, parar e perguntar.
+2. Commitar só a página: `git add 101-dicas-claude-code.html`, mensagem
+   `dicas: adiciona dica NN (<título curto em minúsculas>)` com as linhas de
+   atribuição da sessão. Nunca `git add -A`.
+3. Republicar o artifact `https://claude.ai/artifact/7AaiBkpATMMkncbLV6v9SU` a partir
+   de `101-dicas-claude-code.html`. Nunca criar artifact novo. Se a sessão ainda não
+   publicou nem leu esse artifact, fazer antes o `read` sem `path` e ler o arquivo
+   salvo inteiro em faixas, como diz a lição da `/publicar-dicas`.
+4. `git fetch origin` e `git diff --stat origin/main..main`. Se algum `.pdf` aparecer,
+   parar. Senão, `git push origin main`. Nunca `--force`.
+
+Se um passo falhar, parar nele e reportar. O que já rodou fica registrado em
+`publicacao.txt`, para a retomada pular os passos feitos.
+
 ## Retomada
 
 As saídas de cada fase são arquivos, então uma execução interrompida não recomeça
 do zero. Ao retomar por decisão do portão A, pular para a primeira fase cuja saída
 está faltando, na ordem: `pedido.md`, `fonte.md`, `verificacao.md`, `aprovacao.md`,
-`objeto.js`, `revisao.txt`.
+`objeto.js`, `revisao.txt`, `publicacao.txt`.
 
 Retomar acontece dentro da pasta antiga, com o carimbo original. Carimbo é hora de
 início da execução, não hora da retomada — a pasta nasce uma vez só.
@@ -188,13 +208,16 @@ e a execução nova ganha carimbo próprio. Reset aqui significa pasta nova, nun
   O bloco de estado acima lista os capítulos que já existem.
 - Nunca pular uma fase por achar que ela é rápida: a saída em disco é o que permite
   retomar. Fase sem arquivo é fase que não aconteceu.
-- Não publicar ao final, nem oferecer para publicar sem que a fase 4 tenha passado.
+- Nunca publicar sem que a fase 4 tenha passado com "pronto para publicar".
 - Nunca apagar os intermediários de `<job>/` como parte de uma execução bem-sucedida.
   Eles são o que permite retomar e depurar. Limpeza só a pedido explícito do usuário,
   e só depois de verificar que a página contém a dica e que ela foi publicada.
 - Escrever apenas em `<job>/` e em `101-dicas-claude-code.html`.
   Não escrever em nenhum outro lugar do projeto. Nenhuma fase cria arquivo fora
-  desses dois destinos, nem "temporariamente".
+  desses dois destinos, nem "temporariamente". Os únicos efeitos fora deles são o
+  commit, a republicação e o push da fase 5.
+- Ajuste pedido depois de publicado é trabalho novo: editar a dica, rodar a fase 4 de
+  novo e publicar com a mensagem `dicas: ajusta dica NN (<o que mudou>)`.
 
 ## Lessons Learned
 
@@ -211,11 +234,18 @@ Entrada nova só depois de um erro que de fato aconteceu, nunca preventivamente.
 ```
 DICA: <n> — <título em português>
 FASES: portão A <nova | retomada da fase N> | 0 <ok> | 1 <ok> | 2 <ok|n/a>
-       | portão B <aprovado YYYY-MM-DD> | 3 <ok> | 4 <ok>
+       | portão B <automático YYYY-MM-DD> | 3 <ok> | 4 <ok> | 5 <ok>
 PASTA: output/nova-dica/dica-NN-YYYYMMDD-HHMMSS/ (<n> arquivos)
 CAMPOS: body <ok> | code <n blocos> | note <sim/não> | docs <n>
 MARCADOR: here movido de <n-1> para <n>
 CONTADORES: <ok | divergência>
 REVISÃO: <veredito de /revisar-pagina-dicas>
+COMMIT: <sha curto> <mensagem>
+URL: <url do artifact> (versão <n>)
+PUSH: <main == origin/main | pendente e por quê>
+PARA REVISAR: <nada | a lista do aprovacao.md>
 PENDÊNCIAS: <nenhuma | lista>
 ```
+
+Depois do bloco, o objeto da dica por inteiro (title, orig, body, code, note, docs),
+para o usuário ler o que entrou sem abrir a página.

@@ -124,6 +124,13 @@ Primeira execução em 2026-09-22, publicando as dicas 31 e 32.
 - **As duas entradas acima foram superadas em 2026-11-14.** O usuário pediu menos
   paradas no loop e escolheu que "pode publicar" cubra o push. O passo 3 e o novo
   passo 6 registram isso. As entradas ficam como histórico do porquê.
+- **Em 2026-11-18 a publicação de dica nova passou para dentro da `/nova-dica`.** Na
+  dica 71 o portão B parou, o usuário aprovou, e depois ainda foi preciso digitar
+  `/publicar-dicas` e responder "pode publicar". O usuário pediu um ok só, com ajustes
+  depois de publicado. A `/nova-dica` ganhou uma fase 5 que repete os passos 2, 4, 5 e 6
+  daqui. Esta skill não pode ser chamada pelo modelo, por causa do
+  `disable-model-invocation`. Ela continua servindo para republicar sem dica nova, como
+  um ajuste ou uma mudança de design, e aí o passo 3 continua valendo.
 
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS MANUAIS` no
