@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 70</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 71</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;70<br>(capítulos 1 a 10)</p>
+      <p>Cobertura atual: dicas 1&ndash;71<br>(capítulos 1 a 10)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 70 de 101</b></span>
+        <span>Leitura: <b>dica 71 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 10</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -1021,13 +1021,23 @@ const TIPS = [
     ],
     note:{lbl:"O que a doc corrige", html:`<strong>No Chrome DevTools MCP, o <code>wait_for</code> não recebe seletor CSS.</strong> Ele espera um <strong>texto</strong>: o parâmetro <code>text</code> é uma lista, e a espera termina quando algum valor bate exatamente com um nome acessível ou aparece no texto do DOM, diferenciando maiúsculas. O passo 2 do livro, <code>wait_for selector: ...</code>, não existe nesse servidor. O equivalente é esperar um texto que só aparece quando o formulário carregou, com <code>visible: true</code>, porque por padrão texto oculto também conta.<br><strong>A espera tem teto próprio.</strong> <code>wait_for</code> e <code>navigate_page</code> aceitam <code>timeout</code> em milissegundos, o que dá a cada chamada o mesmo "falhar rápido" que o livro pede para as novas tentativas.`},
     docs:[["Chrome DevTools MCP: ferramentas","https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/tool-reference.md"]] },
-  { n:70, ch:10, here:true,
+  { n:70, ch:10,
     title:"Página de fornecedor com ids duplicados: restrinja todo seletor ao container ativo",
     orig:"When a vendor page has duplicate ids, scope every selector to the active container",
     body:`<p>Este é um dos bugs mais caros que um fluxo de automação de navegador pode encontrar. A página do fornecedor tem uma barra de abas, e o painel de cada aba reaproveita os mesmos <code>id="time_hour"</code> e <code>id="time_minute"</code>. Sem restringir o escopo, <code>document.getElementById("time_hour")</code> devolve o primeiro na ordem do DOM, que é o do painel inativo. Os valores são preenchidos, o "Schedule" é clicado, e nada acontece: os valores foram parar num painel que o usuário nem está vendo.</p>
     <p>A correção é <strong>restringir todo seletor ao container ativo</strong>. Os autores documentam o padrão de seletor no SKILL.md, para o Claude não ter de deduzi-lo.</p>
     <p>E acrescentam uma checagem de sanidade: antes de cada interação, consultar de novo o elemento que diz "esta aba continua selecionada". <strong>Se ele voltar nulo, parar e avisar o usuário</strong>, em vez de chutar.</p>`,
-    code:{lang:"SKILL.md", text:`The page has duplicate \`time_hour\` / \`time_minute\` ids across panels.\nUse the composer-specific ones, scoped to the visible (\`aria-hidden="false"\`) panel:\n\ndocument.querySelector('[role="tabpanel"]:not([aria-hidden="true"]) #time_hour')`} }
+    code:{lang:"SKILL.md", text:`The page has duplicate \`time_hour\` / \`time_minute\` ids across panels.\nUse the composer-specific ones, scoped to the visible (\`aria-hidden="false"\`) panel:\n\ndocument.querySelector('[role="tabpanel"]:not([aria-hidden="true"]) #time_hour')`} },
+  { n:71, ch:10, here:true,
+    title:"Em editores contenteditable, use innerText e dispare um evento input",
+    orig:"For contenteditable composers, use innerText and dispatch input events",
+    body:`<p>Os servidores MCP de navegador oferecem uma ação que simula digitação, e ela funciona na maioria dos campos comuns. Nos editores <code>contenteditable</code> (editores de texto rico, como os de agendadores de redes sociais), ela às vezes perde os primeiros caracteres do texto. Os autores viram a primeira letra e emojis sumirem com tanta frequência que deixaram de usar essa ação nesses campos.</p>
+    <p>O que funciona é <strong>atribuir <code>el.innerText</code> diretamente e disparar um evento <code>input</code> sintético</strong>, para o framework da página perceber a mudança.</p>
+    <p>No SKILL.md deles isso aparece como uma peculiaridade documentada, não como bug. Cada navegador e cada framework trata eventos de input de um jeito, e essa combinação funcionou em todos os apps que eles automatizam.</p>
+    <p>Há uma peculiaridade parecida: colar pelo clipboard com <code>navigator.clipboard.write</code> às vezes falha em silêncio. Para colar HTML em editores de texto rico, eles passam pelo clipboard do sistema operacional, usando o formato CF_HTML do PowerShell com os offsets em bytes corretos. O conteúdo é gravado num arquivo temporário e <strong>nunca vai direto num argumento do PowerShell</strong>.</p>`,
+    code:{lang:"js", text:`el.innerText = newText;\nel.dispatchEvent(new Event('input', { bubbles: true }));`},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>O nome da ação muda de um servidor para outro.</strong> O livro chama a ação de <code>type_text</code>. No Claude in Chrome, ela é a action <code>type</code> da ferramenta <code>computer</code>.<br><strong><code>clipboard.write</code> não falha calado por natureza.</strong> A MDN diz que ele exige contexto seguro e ativação recente do usuário, e que a promise é rejeitada quando o acesso é negado. A falha só some quando ninguém trata essa rejeição, então vale um <code>try</code>/<code>await</code>.<br><strong>O setter de <code>innerText</code> troca <code>\\n</code> por <code>&lt;br&gt;</code></strong> e apaga todos os filhos do elemento. Qualquer formatação que estava no editor se perde.`},
+    docs:[["MDN: HTMLElement.innerText","https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerText"],["MDN: construtor Event()","https://developer.mozilla.org/en-US/docs/Web/API/Event/Event"],["MDN: Clipboard.write()","https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/write"]] }
 ];
 
 /* ---------- render ---------- */
