@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 72</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 73</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;72<br>(capítulos 1 a 10)</p>
+      <p>Cobertura atual: dicas 1&ndash;73<br>(capítulos 1 a 11)</p>
     </div>
   </aside>
 
@@ -253,8 +253,8 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 72 de 101</b></span>
-        <span>Capítulos cobertos: <b>1 a 10</b></span>
+        <span>Leitura: <b>dica 73 de 101</b></span>
+        <span>Capítulos cobertos: <b>1 a 11</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
     </header>
@@ -289,7 +289,9 @@ const CHAPTERS = [
   { n: 9, title: "Subagentes e trabalho em paralelo",
     note: "Subagentes são o jeito de o Claude Code delegar trabalho. O agente principal dispara um subagente com a ferramenta Agent. O subagente roda numa janela de contexto própria, com ferramentas e modelo próprios, e devolve só o resultado: nada do trabalho intermediário entra no contexto principal. Bem usados, eles mantêm a conversa principal limpa durante pesquisa pesada ou trabalho em paralelo. Mal usados, queimam tokens em tarefas que não precisavam de paralelismo. Este capítulo trata da linha entre os dois casos." },
   { n: 10, title: "Cuidados com automação de navegador",
-    note: "Automação de navegador é uma das coisas mais poderosas que o Claude Code pode conduzir, e uma das que mais falham. Páginas mudam, seletores se desatualizam, interfaces de fornecedor repetem o mesmo id em dois lugares e eventos sintéticos às vezes disparam e às vezes não. A distância entre clicar no botão certo e clicar no errado é pequena, por isso estes padrões tratam qualquer fluxo que clica numa página com consequências para pessoas reais com disciplina redobrada." }
+    note: "Automação de navegador é uma das coisas mais poderosas que o Claude Code pode conduzir, e uma das que mais falham. Páginas mudam, seletores se desatualizam, interfaces de fornecedor repetem o mesmo id em dois lugares e eventos sintéticos às vezes disparam e às vezes não. A distância entre clicar no botão certo e clicar no errado é pequena, por isso estes padrões tratam qualquer fluxo que clica numa página com consequências para pessoas reais com disciplina redobrada." },
+  { n: 11, title: "Qualidade de conteúdo e comportamentos proibidos",
+    note: "Quando o Claude escreve prosa (texto técnico, comentários de código, documentação, texto de marketing, qualquer coisa em que as palavras são a própria entrega), a distância entre a saída padrão e a que vai para o ar é grande. Quase toda essa distância se fecha sendo explícito, até o desconforto, sobre o que se quer e o que não se quer. Este capítulo reúne as convenções que os autores foram criando nos fluxos de conteúdo deles. A maioria vive em skills que produzem rascunhos para revisão humana, nunca a palavra final, mas a disciplina vale para qualquer tarefa em que a qualidade do texto importa." }
 ];
 
 const TIPS = [
@@ -1038,7 +1040,7 @@ const TIPS = [
     code:{lang:"js", text:`el.innerText = newText;\nel.dispatchEvent(new Event('input', { bubbles: true }));`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>O nome da ação muda de um servidor para outro.</strong> O livro chama a ação de <code>type_text</code>. No Claude in Chrome, ela é a action <code>type</code> da ferramenta <code>computer</code>.<br><strong><code>clipboard.write</code> não falha calado por natureza.</strong> A MDN diz que ele exige contexto seguro e ativação recente do usuário, e que a promise é rejeitada quando o acesso é negado. A falha só some quando ninguém trata essa rejeição, então vale um <code>try</code>/<code>await</code>.<br><strong>O setter de <code>innerText</code> troca <code>\\n</code> por <code>&lt;br&gt;</code></strong> e apaga todos os filhos do elemento. Qualquer formatação que estava no editor se perde.`},
     docs:[["MDN: HTMLElement.innerText","https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerText"],["MDN: construtor Event()","https://developer.mozilla.org/en-US/docs/Web/API/Event/Event"],["MDN: Clipboard.write()","https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/write"]] },
-  { n:72, ch:10, here:true,
+  { n:72, ch:10,
     title:"Quando o fornecedor mudar os seletores, pare e avise o usuário",
     orig:"When a vendor changes selectors, stop and tell the user",
     body:`<p>A falha mais difícil da automação de navegador é a silenciosa. O fornecedor muda o nome de uma classe, o seletor do agente para de casar, e o Claude segue em frente com uma leitura errada do estado da página.</p>
@@ -1047,7 +1049,20 @@ const TIPS = [
     <p>Uma disciplina parecida vale para alvos que só aparecem com o mouse em cima: <strong>use um hover real</strong> (a ação de hover do MCP de navegador), não um <code>mouseenter</code> sintético. Alguns alvos de clique só são renderizados no DOM depois de um hover real, e eventos sintéticos nem sempre passam pelo mesmo caminho de renderização.</p>`,
     code:{lang:"SKILL.md", text:`If the ids/classes below stop matching the page DOM, do not guess.\nStop and tell the user. The vendor likely updated the UI.\n\nTracked selectors:\n\n- Schedule button: \`button[data-testid="composer-schedule"]\`\n- Date input:      \`input[name="schedule_date"]\`\n- Time hour:       \`[role="tabpanel"]:not([aria-hidden="true"]) #time_hour\`\n- Time minute:     \`[role="tabpanel"]:not([aria-hidden="true"]) #time_minute\``},
     note:{lbl:"O que a doc acrescenta", html:`<strong>No Claude in Chrome, o hover real é a action <code>hover</code> da ferramenta <code>computer</code>.</strong> Ela move o cursor até as coordenadas ou o elemento sem clicar, e serve para revelar tooltips, menus e estados de hover.<br><strong>A página consegue distinguir o evento sintético.</strong> A MDN diz que um evento despachado com <code>dispatchEvent()</code> chega com <code>isTrusted</code> igual a <code>false</code>, e que <code>mouseenter</code> não borbulha nem é enviado aos descendentes. Os dois motivos ajudam a explicar por que o caminho de renderização muda.<br><strong><code>:not([aria-hidden="true"])</code> também casa com um painel sem o atributo.</strong> Se o fornecedor deixar de marcar o painel inativo, o seletor volta a casar com os dois, e é exatamente o tipo de mudança que a regra manda avisar.`},
-    docs:[["Claude in Chrome","https://code.claude.com/docs/en/chrome"],["MDN: Event.isTrusted","https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted"],["MDN: evento mouseenter","https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseenter_event"]] }
+    docs:[["Claude in Chrome","https://code.claude.com/docs/en/chrome"],["MDN: Event.isTrusted","https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted"],["MDN: evento mouseenter","https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseenter_event"]] },
+  { n:73, ch:11, here:true,
+    title:"Proíba os vícios de escrita pelo nome, não pela categoria",
+    orig:"Ban writing tics by name, not by category",
+    body:`<p>Os modelos desenvolvem vícios de escrita característicos, que aparecem em tudo o que geram: "delve", "unlock", "embark", "dive into", "journey into", "in this article we will explore". Instruções por categoria, como "evite linguagem que soa como IA", raramente funcionam, porque o modelo não sabe quais palavras fazem um texto cair nessa categoria.</p>
+    <p>O que funciona é uma <strong>lista literal</strong>. Os autores põem uma linha como a do bloco abaixo em toda skill que redige texto para revisão humana.</p>
+    <p>A lista é curta, específica e cresce devagar. Uma entrada nova só entra quando o mesmo vício aparece em vários rascunhos.</p>
+    <p>Uma disciplina relacionada: ao proibir uma frase, às vezes vale explicar o porquê. "Nada de preâmbulo 'nesta aula, vamos'. Comece pelo assunto." dá ao modelo <strong>uma substituição positiva, e não só uma remoção</strong>.</p>`,
+    code:[
+      {lang:"SKILL.md", text:`No ChatGPT-isms. Avoid these words and phrases known to be AI-generated,\nsuch as delve, unlock, embark, dive into, journey, furthermore, pivotal`},
+      {lang:"SKILL.md — proibição com substituição", text:`No "in this lesson, we will" preambles. Start with the topic.`}
+    ],
+    note:{lbl:"O que a doc acrescenta", html:`<strong>Para a Anthropic, a substituição positiva é a regra, não o "às vezes".</strong> O guia de prompting manda dizer ao Claude o que fazer em vez do que não fazer. O exemplo dele: em vez de "Do not use markdown in your response", escrever "Your response should be composed of smoothly flowing prose paragraphs".<br><strong>O porquê também tem efeito próprio.</strong> O mesmo guia diz que explicar a motivação de uma instrução ajuda o modelo a entender o objetivo. Uma regra que diz por que existe é aplicada melhor do que uma que só proíbe.<br><strong>A lista literal continua útil</strong> para os vícios que uma descrição positiva não pega. As duas formas se completam.`},
+    docs:[["Claude: boas práticas de prompting","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"]] }
 ];
 
 /* ---------- render ---------- */
