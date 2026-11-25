@@ -73,6 +73,13 @@ de fato aconteceu, nunca preventivamente.
   Claude e a aprovação foi do usuário, com a frase literal. O último objeto de
   `CHAPTERS` não tem vírgula final: acrescentar a vírgula ao inserir o capítulo novo.
 
+- **O número do argumento pode ser o da dica já publicada.** Em 2026-11-25 a invocação
+  foi `/nova-dica 71` com a 71 já no ar (pasta completa, até `publicacao.txt`). O usuário
+  queria a 72. O portão A resolveu a confusão com uma terceira opção, além de retomar e de
+  começar de novo: "era a próxima (N+1)". Quando a execução anterior tem `publicacao.txt`
+  e o `here:true` está nessa mesma dica, oferecer essa opção primeiro. A resposta fica no
+  `escolha.md` da pasta nova, a da N+1.
+
 **Manutenção desta seção.** Ao terminar uma execução, revisar as seções relevantes
 desta skill para refletir o que foi aprendido. Toda linha de `PENDÊNCIAS` no relatório
 final é candidata a virar entrada aqui. Sem essa revisão, a seção congela na versão um
