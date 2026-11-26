@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 74</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 75</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;74<br>(capítulos 1 a 11)</p>
+      <p>Cobertura atual: dicas 1&ndash;75<br>(capítulos 1 a 11)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 74 de 101</b></span>
+        <span>Leitura: <b>dica 75 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 11</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -1063,7 +1063,7 @@ const TIPS = [
     ],
     note:{lbl:"O que a doc acrescenta", html:`<strong>Para a Anthropic, a substituição positiva é a regra, não o "às vezes".</strong> O guia de prompting manda dizer ao Claude o que fazer em vez do que não fazer. O exemplo dele: em vez de "Do not use markdown in your response", escrever "Your response should be composed of smoothly flowing prose paragraphs".<br><strong>O porquê também tem efeito próprio.</strong> O mesmo guia diz que explicar a motivação de uma instrução ajuda o modelo a entender o objetivo. Uma regra que diz por que existe é aplicada melhor do que uma que só proíbe.<br><strong>A lista literal continua útil</strong> para os vícios que uma descrição positiva não pega. As duas formas se completam.`},
     docs:[["Claude: boas práticas de prompting","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"]] },
-  { n:74, ch:11, here:true,
+  { n:74, ch:11,
     title:"Proíba o travessão, e diga ao modelo que o problema é o padrão de escrita",
     orig:"Ban em dashes, and tell the model the issue is the writing pattern",
     body:`<p>O travessão (em dash, <code>—</code>) é um caso especial, porque a tentação é tratá-lo como problema de tipografia. Não é. É um problema de padrão de escrita: uma cadência específica de interrupção no meio da frase, que o modelo usa demais.</p>
@@ -1071,7 +1071,17 @@ const TIPS = [
     <p>A frase <strong>"the issue is the writing pattern, not the character"</strong> é o que faz a regra funcionar. Sem ela, o Claude acha cada <code>—</code> e troca por uma vírgula, e o hábito por baixo continua. Com ela, o agente reescreve as frases, que é a correção de verdade.</p>`,
     code:{lang:"SKILL.md e CLAUDE.md", text:"Do not use em dashes. Do not just swap `—` for `-`. The issue is the\nwriting pattern, not the character. Rewrite with commas, parentheses,\nor colons."},
     note:{lbl:"O que a doc acrescenta", html:`<strong>A regra usa as duas técnicas do guia de prompting da Anthropic.</strong> Ela explica o porquê ("o problema é o padrão de escrita"), e o guia diz que dar a motivação de uma instrução ajuda o modelo a entender o objetivo. E ela termina dizendo o que usar no lugar (vírgulas, parênteses, dois-pontos), que é o "diga o que fazer em vez do que não fazer" do guia.<br><strong>Par com a <a href="#dica-73">dica 73</a>.</strong> Lá, a lista literal tira as palavras pelo nome. Aqui, o alvo é uma construção de frase, e por isso a regra precisa nomear o padrão, não só o caractere.`},
-    docs:[["Claude: boas práticas de prompting","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"]] }
+    docs:[["Claude: boas práticas de prompting","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"]] },
+  { n:75, ch:11, here:true,
+    title:"Proíba fatos inventados: toda afirmação tem de vir de uma fonte",
+    orig:"Forbid invented facts, require every claim to trace to a source",
+    body:`<p>Em conteúdo técnico, precisão importa mais que fluência. Toda skill dos autores que redige material factual traz uma linha como a do bloco abaixo.</p>
+    <p>A regra da <strong>"fonte do fornecedor em disco"</strong> anda junto com a disciplina de espelho local do capítulo 12. Os autores aceitam a documentação do fornecedor como autoridade, mantêm uma cópia local dela, e a skill tira as afirmações só desse espelho. <strong>Tudo o que o Claude quiser escrever sem fonte no espelho é removido, mesmo que pareça plausível.</strong></p>
+    <p>O resultado são rascunhos mais curtos que a versão sem restrição, mas defensáveis. A pergunta "de onde você tirou isso?" sempre tem como resposta um caminho de arquivo.</p>
+    <p>Uma regra relacionada vale para tarefas de transformação, como transformar um rascunho longo num resumo curto ou uma transcrição num roteiro escrito: a transformação tem de ser <strong>sem perda</strong>. Nenhuma informação nova pode aparecer, e nenhuma informação essencial pode sumir. Os autores chamam isso de regra "tradução, não autoria" ("translation, not authoring").</p>`,
+    code:{lang:"SKILL.md", text:`Every concrete fact, definition, label, number, feature name, and\nbehavior must trace to a vendor-owned source we have on disk. If a\nclaim cannot be sourced from our local mirror, do not include it.`},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>A regra junta duas técnicas do guia da Anthropic contra alucinação.</strong> Uma é restringir o conhecimento externo: mandar o Claude usar só a informação dos documentos fornecidos, não o conhecimento geral. A outra é verificar com citações: para cada afirmação, achar um trecho da fonte que a sustente, e retirar a afirmação quando o trecho não aparece. O "caminho de arquivo" do livro é a versão em disco dessa citação.<br><strong>O guia dá uma terceira técnica, que o livro não cita:</strong> dar ao Claude permissão explícita para dizer "não sei". Numa skill que remove o que não tem fonte, isso dá ao modelo uma saída honesta em vez de um palpite.`},
+    docs:[["Claude: reduzir alucinações","https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"]] }
 ];
 
 /* ---------- render ---------- */
