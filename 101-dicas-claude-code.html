@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 75</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 76</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;75<br>(capítulos 1 a 11)</p>
+      <p>Cobertura atual: dicas 1&ndash;76<br>(capítulos 1 a 11)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 75 de 101</b></span>
+        <span>Leitura: <b>dica 76 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 11</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -1072,7 +1072,7 @@ const TIPS = [
     code:{lang:"SKILL.md e CLAUDE.md", text:"Do not use em dashes. Do not just swap `—` for `-`. The issue is the\nwriting pattern, not the character. Rewrite with commas, parentheses,\nor colons."},
     note:{lbl:"O que a doc acrescenta", html:`<strong>A regra usa as duas técnicas do guia de prompting da Anthropic.</strong> Ela explica o porquê ("o problema é o padrão de escrita"), e o guia diz que dar a motivação de uma instrução ajuda o modelo a entender o objetivo. E ela termina dizendo o que usar no lugar (vírgulas, parênteses, dois-pontos), que é o "diga o que fazer em vez do que não fazer" do guia.<br><strong>Par com a <a href="#dica-73">dica 73</a>.</strong> Lá, a lista literal tira as palavras pelo nome. Aqui, o alvo é uma construção de frase, e por isso a regra precisa nomear o padrão, não só o caractere.`},
     docs:[["Claude: boas práticas de prompting","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"]] },
-  { n:75, ch:11, here:true,
+  { n:75, ch:11,
     title:"Proíba fatos inventados: toda afirmação tem de vir de uma fonte",
     orig:"Forbid invented facts, require every claim to trace to a source",
     body:`<p>Em conteúdo técnico, precisão importa mais que fluência. Toda skill dos autores que redige material factual traz uma linha como a do bloco abaixo.</p>
@@ -1081,7 +1081,17 @@ const TIPS = [
     <p>Uma regra relacionada vale para tarefas de transformação, como transformar um rascunho longo num resumo curto ou uma transcrição num roteiro escrito: a transformação tem de ser <strong>sem perda</strong>. Nenhuma informação nova pode aparecer, e nenhuma informação essencial pode sumir. Os autores chamam isso de regra "tradução, não autoria" ("translation, not authoring").</p>`,
     code:{lang:"SKILL.md", text:`Every concrete fact, definition, label, number, feature name, and\nbehavior must trace to a vendor-owned source we have on disk. If a\nclaim cannot be sourced from our local mirror, do not include it.`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>A regra junta duas técnicas do guia da Anthropic contra alucinação.</strong> Uma é restringir o conhecimento externo: mandar o Claude usar só a informação dos documentos fornecidos, não o conhecimento geral. A outra é verificar com citações: para cada afirmação, achar um trecho da fonte que a sustente, e retirar a afirmação quando o trecho não aparece. O "caminho de arquivo" do livro é a versão em disco dessa citação.<br><strong>O guia dá uma terceira técnica, que o livro não cita:</strong> dar ao Claude permissão explícita para dizer "não sei". Numa skill que remove o que não tem fonte, isso dá ao modelo uma saída honesta em vez de um palpite.`},
-    docs:[["Claude: reduzir alucinações","https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"]] }
+    docs:[["Claude: reduzir alucinações","https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"]] },
+  { n:76, ch:11, here:true,
+    title:"Proíba o modelo de reescrever dados estruturados",
+    orig:"Forbid LLM rewrites of structured data",
+    body:`<p>Há uma classe de conteúdo que deve passar <strong>literal</strong>, sem nunca atravessar o modelo: perguntas e respostas de quiz, texto de licença, texto regulatório, blocos de código que estão sendo reproduzidos, tudo o que exige precisão técnica ou jurídica.</p>
+  <p>A tentação é deixar o Claude "polir" a redação. Só que <strong>uma pergunta polida com outro sentido é uma pergunta errada.</strong></p>
+  <p>Toda skill dos autores que lida com esse tipo de conteúdo traz a regra do bloco abaixo.</p>
+  <p>A regra é imposta <strong>na camada de script, não na camada de prompt</strong>. Um parser faz a extração mecânica, e um passo de renderização põe o conteúdo extraído na saída. Os dados em si nunca fazem ida e volta pelo modelo.</p>`,
+    code:{lang:"SKILL.md", text:`No LLM calls on structured-data content. Extraction is mechanical:\nparse the source format, write to the destination format, no\nrewording.`},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>O guia de boas práticas de skills da Anthropic chama isso de grau de liberdade.</strong> Quando a operação é frágil e a consistência é crítica, a skill deve dar pouca liberdade: um script específico, com poucos ou nenhum parâmetro, e a instrução de rodá-lo sem mudar nada. A imagem do guia é a de uma ponte estreita com penhasco dos dois lados, em que só existe um caminho seguro.<br><strong>O guia também diz por que o script ganha do modelo:</strong> é mais confiável que código gerado, economiza tokens e dá o mesmo resultado em todo uso. E pede que a skill deixe claro se o Claude deve executar o script ou só lê-lo como referência. Para a regra desta dica, o certo é executar.`},
+    docs:[["Claude: boas práticas de criação de skills","https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"]] }
 ];
 
 /* ---------- render ---------- */
