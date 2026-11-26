@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 76</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 77</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;76<br>(capítulos 1 a 11)</p>
+      <p>Cobertura atual: dicas 1&ndash;77<br>(capítulos 1 a 11)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 76 de 101</b></span>
+        <span>Leitura: <b>dica 77 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 11</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -1082,7 +1082,7 @@ const TIPS = [
     code:{lang:"SKILL.md", text:`Every concrete fact, definition, label, number, feature name, and\nbehavior must trace to a vendor-owned source we have on disk. If a\nclaim cannot be sourced from our local mirror, do not include it.`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>A regra junta duas técnicas do guia da Anthropic contra alucinação.</strong> Uma é restringir o conhecimento externo: mandar o Claude usar só a informação dos documentos fornecidos, não o conhecimento geral. A outra é verificar com citações: para cada afirmação, achar um trecho da fonte que a sustente, e retirar a afirmação quando o trecho não aparece. O "caminho de arquivo" do livro é a versão em disco dessa citação.<br><strong>O guia dá uma terceira técnica, que o livro não cita:</strong> dar ao Claude permissão explícita para dizer "não sei". Numa skill que remove o que não tem fonte, isso dá ao modelo uma saída honesta em vez de um palpite.`},
     docs:[["Claude: reduzir alucinações","https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations"]] },
-  { n:76, ch:11, here:true,
+  { n:76, ch:11,
     title:"Proíba o modelo de reescrever dados estruturados",
     orig:"Forbid LLM rewrites of structured data",
     body:`<p>Há uma classe de conteúdo que deve passar <strong>literal</strong>, sem nunca atravessar o modelo: perguntas e respostas de quiz, texto de licença, texto regulatório, blocos de código que estão sendo reproduzidos, tudo o que exige precisão técnica ou jurídica.</p>
@@ -1091,7 +1091,17 @@ const TIPS = [
   <p>A regra é imposta <strong>na camada de script, não na camada de prompt</strong>. Um parser faz a extração mecânica, e um passo de renderização põe o conteúdo extraído na saída. Os dados em si nunca fazem ida e volta pelo modelo.</p>`,
     code:{lang:"SKILL.md", text:`No LLM calls on structured-data content. Extraction is mechanical:\nparse the source format, write to the destination format, no\nrewording.`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>O guia de boas práticas de skills da Anthropic chama isso de grau de liberdade.</strong> Quando a operação é frágil e a consistência é crítica, a skill deve dar pouca liberdade: um script específico, com poucos ou nenhum parâmetro, e a instrução de rodá-lo sem mudar nada. A imagem do guia é a de uma ponte estreita com penhasco dos dois lados, em que só existe um caminho seguro.<br><strong>O guia também diz por que o script ganha do modelo:</strong> é mais confiável que código gerado, economiza tokens e dá o mesmo resultado em todo uso. E pede que a skill deixe claro se o Claude deve executar o script ou só lê-lo como referência. Para a regra desta dica, o certo é executar.`},
-    docs:[["Claude: boas práticas de criação de skills","https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"]] }
+    docs:[["Claude: boas práticas de criação de skills","https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"]] },
+  { n:77, ch:11, here:true,
+    title:"Calibre a revisão de estilo com uma porcentagem",
+    orig:"Calibrate “polish” passes with a percentage",
+    body:`<p>Ao pedir ao Claude uma passada de polimento editorial, os autores dizem <strong>quanto</strong> deve mudar. Sem uma meta, o modelo reescreve tudo: "polir" vira "reescrever", e se perdem os trechos que se queria manter.</p>
+  <p>A linha que eles usam está no bloco abaixo.</p>
+  <p><strong>A porcentagem é a parte que calibra.</strong> "~10%" diz ao modelo para ser conservador. "Only soften passages that read noticeably robotic" dá um critério positivo de quais frases mexer. Juntas, as duas produzem uma revisão que reforça as frases fracas sem achatar as fortes.</p>
+  <p>A mesma calibragem vale para a maioria das tarefas editoriais. "Enxugue" sem meta vira "reescreva com metade do tamanho". <strong>"Enxugue uns 20%"</strong> produz uma versão mais curta em que o original ainda é reconhecível.</p>`,
+    code:{lang:"SKILL.md", text:`Aim for ~10% of sentences changed, not 100%. Most prose is fine as-is.\nOnly soften passages that read noticeably robotic when read aloud.`},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>O guia de prompting da Anthropic abre com o mesmo princípio: seja claro e direto.</strong> Ser específico sobre a saída que se quer, o formato e as restrições melhora o resultado. A porcentagem do livro é uma dessas restrições, posta num número.<br><strong>O guia dá um teste para saber se a instrução está clara:</strong> mostrar o prompt a um colega com pouco contexto da tarefa e pedir que ele o siga. Se o colega ficaria em dúvida, o Claude também fica. "Dê um polimento" reprova nesse teste, porque ninguém sabe quanto mudar.`},
+    docs:[["Claude: boas práticas de prompting","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"]] }
 ];
 
 /* ---------- render ---------- */
