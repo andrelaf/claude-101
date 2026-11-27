@@ -232,7 +232,7 @@
     </div>
 
     <div class="gauge">
-      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 77</b></div>
+      <div class="gauge-top"><span>Dicas praticadas</span><b id="gaugeCount">0 / 78</b></div>
       <div class="track"><div class="fill" id="gaugeFill"></div></div>
     </div>
 
@@ -243,7 +243,7 @@
     <div class="rail-foot">
       <button class="btn" id="themeBtn" type="button">Alternar tema</button>
       <button class="btn" id="resetBtn" type="button">Zerar progresso</button>
-      <p>Cobertura atual: dicas 1&ndash;77<br>(capítulos 1 a 11)</p>
+      <p>Cobertura atual: dicas 1&ndash;78<br>(capítulos 1 a 11)</p>
     </div>
   </aside>
 
@@ -253,7 +253,7 @@
       <h1>101 Dicas de Claude Code</h1>
       <p>Caderno de prática das dicas do livro. Cada dica traz o essencial, o comando ou arquivo que importa, e a armadilha que ela evita. Marque as que você já exercitou &mdash; o progresso fica salvo neste navegador.</p>
       <div class="meta">
-        <span>Leitura: <b>dica 77 de 101</b></span>
+        <span>Leitura: <b>dica 78 de 101</b></span>
         <span>Capítulos cobertos: <b>1 a 11</b></span>
         <span>Fonte: <b>101 Claude Code Tips</b>, Zenva Pty Ltd, 2026</span>
       </div>
@@ -1092,7 +1092,7 @@ const TIPS = [
     code:{lang:"SKILL.md", text:`No LLM calls on structured-data content. Extraction is mechanical:\nparse the source format, write to the destination format, no\nrewording.`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>O guia de boas práticas de skills da Anthropic chama isso de grau de liberdade.</strong> Quando a operação é frágil e a consistência é crítica, a skill deve dar pouca liberdade: um script específico, com poucos ou nenhum parâmetro, e a instrução de rodá-lo sem mudar nada. A imagem do guia é a de uma ponte estreita com penhasco dos dois lados, em que só existe um caminho seguro.<br><strong>O guia também diz por que o script ganha do modelo:</strong> é mais confiável que código gerado, economiza tokens e dá o mesmo resultado em todo uso. E pede que a skill deixe claro se o Claude deve executar o script ou só lê-lo como referência. Para a regra desta dica, o certo é executar.`},
     docs:[["Claude: boas práticas de criação de skills","https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"]] },
-  { n:77, ch:11, here:true,
+  { n:77, ch:11,
     title:"Calibre a revisão de estilo com uma porcentagem",
     orig:"Calibrate “polish” passes with a percentage",
     body:`<p>Ao pedir ao Claude uma passada de polimento editorial, os autores dizem <strong>quanto</strong> deve mudar. Sem uma meta, o modelo reescreve tudo: "polir" vira "reescrever", e se perdem os trechos que se queria manter.</p>
@@ -1101,7 +1101,17 @@ const TIPS = [
   <p>A mesma calibragem vale para a maioria das tarefas editoriais. "Enxugue" sem meta vira "reescreva com metade do tamanho". <strong>"Enxugue uns 20%"</strong> produz uma versão mais curta em que o original ainda é reconhecível.</p>`,
     code:{lang:"SKILL.md", text:`Aim for ~10% of sentences changed, not 100%. Most prose is fine as-is.\nOnly soften passages that read noticeably robotic when read aloud.`},
     note:{lbl:"O que a doc acrescenta", html:`<strong>O guia de prompting da Anthropic abre com o mesmo princípio: seja claro e direto.</strong> Ser específico sobre a saída que se quer, o formato e as restrições melhora o resultado. A porcentagem do livro é uma dessas restrições, posta num número.<br><strong>O guia dá um teste para saber se a instrução está clara:</strong> mostrar o prompt a um colega com pouco contexto da tarefa e pedir que ele o siga. Se o colega ficaria em dúvida, o Claude também fica. "Dê um polimento" reprova nesse teste, porque ninguém sabe quanto mudar.`},
-    docs:[["Claude: boas práticas de prompting","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"]] }
+    docs:[["Claude: boas práticas de prompting","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"]] },
+  { n:78, ch:11, here:true,
+    title:"Dê ao Claude uma checklist editorial para rodar antes da saída",
+    orig:"Use an explicit editorial checklist Claude must run before output",
+    body:`<p>Para conteúdo com exigências de estrutura que se repetem, os autores põem uma <strong>checklist editorial no fim do SKILL.md</strong> e exigem que o Claude confira cada item antes de declarar o trabalho pronto.</p>
+  <p>O bloco abaixo é a checklist de um fluxo de redação de e-mails.</p>
+  <p>O Claude lê a checklist, percorre item por item de forma explícita, e <strong>só depois converte para o formato de saída</strong>. O que reprova na checklist é corrigido antes da conversão.</p>
+  <p>Para os autores, esse é um dos padrões que mais pegam problemas por token gasto. A checklist é curta e a verificação é rápida. <strong>Mandar um rascunho com uma frase proibida custa muito mais que a checagem a mais.</strong></p>`,
+    code:{lang:"SKILL.md", text:`## Editorial checklist (verify before converting to HTML)\n\n- Subject line is under 50 characters.\n- First sentence is a hook, not a salutation.\n- Body uses second person ("you"), not first-person plural ("we").\n- One CTA only. No competing calls to action.\n- No em dashes. No banned phrases.\n- All product names are correctly capitalized.\n- Final paragraph references the next email's topic.`},
+    note:{lbl:"O que a doc acrescenta", html:`<strong>O guia de boas práticas de skills da Anthropic recomenda o mesmo para fluxos complexos.</strong> A skill dá uma checklist que o Claude copia na própria resposta e vai marcando conforme avança. Segundo o guia, passos claros impedem o Claude de pular uma validação crítica, e a checklist ajuda tanto o Claude quanto você a acompanhar o andamento.<br><strong>O guia chama o passo seguinte de ciclo de feedback:</strong> rodar o validador, corrigir, repetir. O validador não precisa ser um script: pode ser um documento de referência, como um guia de estilo, que o Claude lê e compara com o rascunho. A checklist do livro faz esse papel.`},
+    docs:[["Claude: boas práticas de criação de skills","https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"]] }
 ];
 
 /* ---------- render ---------- */
